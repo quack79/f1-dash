@@ -10,7 +10,7 @@ export const useAnimatedNumber = (value: number) => {
 			ease: "easeOut",
 			onUpdate: (v) => setV(v),
 		});
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		// eslint-disable-next-line @eslint-react/exhaustive-deps
 	}, [value]);
 
 	return v;

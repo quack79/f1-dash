@@ -17,7 +17,7 @@ export default function RaceControl() {
 	const raceControlChimeVolume = useSettingsStore((state) => state.raceControlChimeVolume);
 
 	const chimeRef = useRef<HTMLAudioElement | null>(null);
-	const pastMessageTimestamps = useRef<string[] | null>(null);
+	const pastMessageTimestampsRef = useRef<string[] | null>(null);
 
 	useEffect(() => {
 		if (typeof window !== "undefined") {
@@ -29,7 +29,7 @@ export default function RaceControl() {
 				chimeRef.current = null;
 			};
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		// eslint-disable-next-line @eslint-react/exhaustive-deps
 	}, []);
 
 	useEffect(() => {
@@ -37,24 +37,25 @@ export default function RaceControl() {
 
 		if (messages === undefined || messages === null) return;
 
-		if (!pastMessageTimestamps.current) {
-			pastMessageTimestamps.current = messages.map((msg) => msg.Utc);
+		if (!pastMessageTimestampsRef.current) {
+			pastMessageTimestampsRef.current = messages.map((msg) => msg.Utc);
 			return;
 		}
 
-		const newMessages = messages.filter((msg) => !pastMessageTimestamps.current?.includes(msg.Utc));
+		const newMessages = messages.filter((msg) => !pastMessageTimestampsRef.current?.includes(msg.Utc));
 
 		if (newMessages.length > 0 && raceControlChime) {
 			chimeRef.current?.play();
 		}
 
-		pastMessageTimestamps.current = messages.map((msg) => msg.Utc);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		pastMessageTimestampsRef.current = messages.map((msg) => msg.Utc);
+		// eslint-disable-next-line @eslint-react/exhaustive-deps
 	}, [messages]);
 
 	return (
 		<ul className="flex flex-col gap-2">
 			{!messages &&
+				// eslint-disable-next-line @eslint-react/no-array-index-key
 				new Array(7).fill("").map((_, index) => <SkeletonMessage key={`msg.loading.${index}`} index={index} />)}
 
 			{messages && gmtOffset && (
@@ -62,8 +63,8 @@ export default function RaceControl() {
 					{messages
 						.sort(sortUtc)
 						.filter((msg) => (msg.Flag ? msg.Flag.toLowerCase() !== "blue" : true))
-						.map((msg, i) => (
-							<RaceControlMessage key={`msg.${i}`} msg={msg} gmtOffset={gmtOffset} />
+						.map((msg) => (
+							<RaceControlMessage key={`msg.${msg.Utc}`} msg={msg} gmtOffset={gmtOffset} />
 						))}
 				</AnimatePresence>
 			)}

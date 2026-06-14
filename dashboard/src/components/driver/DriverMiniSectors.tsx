@@ -15,10 +15,12 @@ export default function DriverMiniSectors({ sectors = [], bestSectors }: Props) 
 	return (
 		<div className="flex gap-2">
 			{sectors.map((sector, i) => (
+				// eslint-disable-next-line @eslint-react/no-array-index-key
 				<div key={`sector.${i}`} className="flex flex-col gap-1">
 					{showMiniSectors && (
 						<div className="flex flex-row gap-1">
 							{sector.Segments.map((segment, j) => (
+								// eslint-disable-next-line @eslint-react/no-array-index-key
 								<MiniSector status={segment.Status} key={`sector.mini.${j}`} />
 							))}
 						</div>

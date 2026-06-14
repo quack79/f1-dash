@@ -121,8 +121,10 @@ export default function Map({ filter, viewBoxPadding = SPACE, viewBoxBottomPaddi
 	const raceControlMessages = useDataStore((state) => state?.state?.RaceControlMessages?.Messages ?? undefined);
 	const circuitKey = useDataStore((state) => state?.state?.SessionInfo?.Meeting.Circuit.Key);
 
-	const [[minX, minY, widthX, widthY], setBounds] = useState<(null | number)[]>([null, null, null, null]);
-	const [[centerX, centerY], setCenter] = useState<(null | number)[]>([null, null]);
+	const [bounds, setBounds] = useState<(null | number)[]>([null, null, null, null]);
+	const [minX, minY, widthX, widthY] = bounds;
+	const [center, setCenter] = useState<(null | number)[]>([null, null]);
+	const [centerX, centerY] = center;
 
 	const [points, setPoints] = useState<null | { x: number; y: number }[]>(null);
 	const [sectors, setSectors] = useState<MapSector[]>([]);

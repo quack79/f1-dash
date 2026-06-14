@@ -31,7 +31,7 @@ export default function DelayInput({ className, saveDelay }: Props) {
 		if (isPaused) return;
 		if (timeoutRef.current) clearTimeout(timeoutRef.current);
 		timeoutRef.current = setTimeout(updateDelay, saveDelay || 0);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		// eslint-disable-next-line @eslint-react/exhaustive-deps
 	}, [delayState]);
 
 	useEffect(() => {

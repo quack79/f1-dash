@@ -72,14 +72,14 @@ export default function Round({ round, nextName }: Props) {
 			</div>
 
 			<div className="grid grid-cols-3 gap-8 pt-2">
-				{groupSessionByDay(round.sessions).map((day, i) => (
-					<div className="flex flex-col" key={`round.day.${i}`}>
+				{groupSessionByDay(round.sessions).map((day) => (
+					<div className="flex flex-col" key={`round.day.${day.date}`}>
 						<p className="my-3 text-xl text-white">{utc(day.date).local().format("dddd")}</p>
 
 						<div className="grid grid-rows-2 gap-2">
-							{day.sessions.map((session, j) => (
+							{day.sessions.map((session) => (
 								<div
-									key={`round.day.${i}.session.${j}`}
+									key={`session.${session.start}`}
 									className={clsx("flex flex-col", !round.over && utc(session.end).isBefore(now()) && "opacity-50")}
 								>
 									<p className="w-28 overflow-hidden text-ellipsis whitespace-nowrap sm:w-auto">{session.kind}</p>

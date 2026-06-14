@@ -12,9 +12,13 @@ type Props = {
 };
 
 export default function Countdown({ next, type }: Props) {
-	const [[days, hours, minutes, seconds], setDuration] = useState<
-		[number | null, number | null, number | null, number | null]
-	>([null, null, null, null]);
+	const [countdown, setCountdown] = useState<[number | null, number | null, number | null, number | null]>([
+		null,
+		null,
+		null,
+		null,
+	]);
+	const [days, hours, minutes, seconds] = countdown;
 
 	const nextMoment = utc(next.start);
 
@@ -27,9 +31,9 @@ export default function Countdown({ next, type }: Props) {
 			const days = parseInt(diff.asDays().toString());
 
 			if (diff.asSeconds() > 0) {
-				setDuration([days, diff.hours(), diff.minutes(), diff.seconds()]);
+				setCountdown([days, diff.hours(), diff.minutes(), diff.seconds()]);
 			} else {
-				setDuration([0, 0, 0, 0]);
+				setCountdown([0, 0, 0, 0]);
 			}
 
 			requestRef.current = requestAnimationFrame(animateNextFrame);

@@ -4,6 +4,7 @@ import nextPlugin from "@next/eslint-plugin-next";
 import tseslint from "typescript-eslint";
 import prettier from "eslint-plugin-prettier";
 import prettierConfig from "eslint-config-prettier";
+import reactHooks from "eslint-plugin-react-hooks";
 
 export default defineConfig([
 	// TypeScript recommended rules (parser + base + recommended)
@@ -18,6 +19,7 @@ export default defineConfig([
 		extends: [eslintReact.configs.recommended],
 		plugins: {
 			prettier,
+			"react-hooks": reactHooks,
 		},
 		rules: {
 			"prettier/prettier": "error",

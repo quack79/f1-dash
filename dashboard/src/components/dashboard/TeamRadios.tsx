@@ -20,16 +20,18 @@ export default function TeamRadios() {
 
 	return (
 		<ul className="flex flex-col gap-2">
-			{!teamRadios && new Array(6).fill("").map((_, index) => <SkeletonMessage key={`radio.loading.${index}`} />)}
+			{!teamRadios &&
+				// eslint-disable-next-line @eslint-react/no-array-index-key
+				new Array(6).fill("").map((_, index) => <SkeletonMessage key={`radio.loading.${index}`} />)}
 
 			{teamRadios && gmtOffset && drivers && teamRadios.Captures && (
 				<AnimatePresence>
 					{teamRadios.Captures.sort(sortUtc)
 						.slice(0, 20)
 						.filter((teamRadio) => drivers[teamRadio.RacingNumber] !== undefined)
-						.map((teamRadio, i) => (
+						.map((teamRadio) => (
 							<RadioMessage
-								key={`radio.${i}`}
+								key={`radio.${teamRadio.Utc}`}
 								driver={drivers[teamRadio.RacingNumber]}
 								capture={teamRadio}
 								basePath={basePath}

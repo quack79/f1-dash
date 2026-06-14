@@ -49,6 +49,7 @@ export default function Qualifying() {
 				{qualifyingDrivers.length < 1 && (
 					<>
 						{new Array(3).fill(null).map((_, i) => (
+							// eslint-disable-next-line @eslint-react/no-array-index-key
 							<SkeletonQualifyingDriver key={`skeleton.qualifying.driver.${i}`} />
 						))}
 					</>
@@ -79,6 +80,7 @@ const SkeletonQualifyingDriver = () => {
 
 			<div className="flex w-full gap-1">
 				{new Array(3).fill(null).map((_, index) => (
+					// eslint-disable-next-line @eslint-react/no-array-index-key
 					<div className="flex w-full flex-col gap-1" key={`skeleton.sector.${index}`}>
 						<div className={clsx(animateClass, "h-4!")} />
 						<div className={clsx(animateClass, "h-3!")} />

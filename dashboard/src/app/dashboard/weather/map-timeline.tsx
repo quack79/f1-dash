@@ -40,14 +40,14 @@ function clamp(number: number, min: number, max: number) {
 
 function useInterval(callback: () => void, delay: number | null) {
 	const intervalRef = useRef<null | NodeJS.Timeout>(null);
-	const savedCallback = useRef(callback);
+	const savedCallbackRef = useRef(callback);
 
 	useEffect(() => {
-		savedCallback.current = callback;
+		savedCallbackRef.current = callback;
 	}, [callback]);
 
 	useEffect(() => {
-		const tick = () => savedCallback.current();
+		const tick = () => savedCallbackRef.current();
 
 		if (typeof delay === "number") {
 			intervalRef.current = setInterval(tick, delay);
@@ -219,7 +219,7 @@ export default function Timeline({ frames, setFrame, playing }: Props) {
 				{Array.from({ length: legendCount }).map((_, i) => {
 					const legendTime = startTime + i * timeInterval;
 					return (
-						<div key={i} className="text-xs text-zinc-500">
+						<div key={legendTime} className="text-xs text-zinc-500">
 							{unix(legendTime).format("HH:mm")}
 						</div>
 					);

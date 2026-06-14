@@ -14,6 +14,7 @@ export default function DriverHistoryTires({ stints }: Props) {
 		<div className="flex flex-row items-center justify-start gap-1">
 			{stints &&
 				stints.map((stint, i) => (
+					// eslint-disable-next-line @eslint-react/no-array-index-key
 					<div className="flex flex-col items-center gap-1" key={`driver.${i}`}>
 						{unknownCompound(stint) && <Image src={"/tires/unknown.svg"} width={32} height={32} alt="unknown" />}
 						{!unknownCompound(stint) && stint.Compound && (

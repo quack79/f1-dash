@@ -24,6 +24,7 @@ export default function TrackMap() {
 		<div className="flex flex-col-reverse md:h-full md:flex-row">
 			<div className="flex w-full flex-col gap-0.5 overflow-y-auto border-zinc-800 md:h-full md:w-fit md:rounded-lg md:border md:p-2">
 				{(!drivers || !driversTiming) &&
+					// eslint-disable-next-line @eslint-react/no-array-index-key
 					new Array(20).fill("").map((_, index) => <SkeletonDriver key={`driver.loading.${index}`} />)}
 
 				{drivers && driversTiming && (
@@ -116,6 +117,7 @@ const SkeletonDriver = () => {
 			<div className={animateClass} style={{ width: "90%" }} />
 
 			{new Array(2).fill(null).map((_, index) => (
+				// eslint-disable-next-line @eslint-react/no-array-index-key
 				<div className="flex w-full flex-col gap-1" key={`skeleton.${index}`}>
 					<div className={clsx(animateClass, "h-4!")} />
 					<div className={clsx(animateClass, "h-3! w-2/3")} />

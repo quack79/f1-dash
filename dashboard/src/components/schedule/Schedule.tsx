@@ -37,8 +37,8 @@ export default async function Schedule() {
 
 	return (
 		<div className="mb-20 grid grid-cols-1 gap-8 md:grid-cols-2">
-			{schedule.map((round, roundI) => (
-				<Round nextName={next?.name} round={round} key={`round.${roundI}`} />
+			{schedule.map((round) => (
+				<Round nextName={next?.name} round={round} key={`round.${round.name}`} />
 			))}
 		</div>
 	);

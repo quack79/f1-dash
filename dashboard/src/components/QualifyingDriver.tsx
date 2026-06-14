@@ -81,6 +81,7 @@ export default function DriverQuali({
 
 			<div className="grid grid-cols-3 gap-1">
 				{timingDriver.Sectors.map((sector, i) => (
+					// eslint-disable-next-line @eslint-react/no-array-index-key
 					<div className="flex flex-col gap-1" key={`quali.sector.${driver.Tla}.${i}`}>
 						<div
 							className={clsx("h-4 rounded-md", {

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 
 export const useWakeLock = () => {
-	const wakeLock = useRef<null | WakeLockSentinel>(null);
+	const wakeLockRef = useRef<null | WakeLockSentinel>(null);
 
 	useEffect(() => {
 		if (typeof window !== "undefined") {
@@ -12,13 +12,13 @@ export const useWakeLock = () => {
 			if (!("wakeLock" in navigator)) return;
 
 			navigator.wakeLock.request("screen").then((wl) => {
-				wakeLock.current = wl;
+				wakeLockRef.current = wl;
 			});
 		}
 
 		return () => {
-			if (wakeLock.current) {
-				wakeLock.current.release();
+			if (wakeLockRef.current) {
+				wakeLockRef.current.release();
 			}
 		};
 	}, []);

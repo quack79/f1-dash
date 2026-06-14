@@ -1,9 +1,6 @@
+import { useState } from "react";
+
 export const useDevMode = () => {
-	let active = false;
-
-	if (typeof window !== "undefined") {
-		active = !!localStorage.getItem("dev");
-	}
-
+	const [active] = useState(() => typeof window !== "undefined" && !!localStorage.getItem("dev"));
 	return { active };
 };

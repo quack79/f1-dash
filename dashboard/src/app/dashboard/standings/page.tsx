@@ -84,6 +84,7 @@ export default function Standings() {
 				<div className="divide flex flex-col divide-y divide-zinc-800">
 					{!driverStandings &&
 						!error &&
+						// eslint-disable-next-line @eslint-react/no-array-index-key
 						new Array(20).fill("").map((_, index) => <DriverSkeletonItem key={`driver.loading.${index}`} />)}
 
 					{driverStandings &&
@@ -117,6 +118,7 @@ export default function Standings() {
 				<div className="divide flex flex-col divide-y divide-zinc-800">
 					{!teamStandings &&
 						!error &&
+						// eslint-disable-next-line @eslint-react/no-array-index-key
 						new Array(10).fill("").map((_, index) => <TeamSkeletonItem key={`team.loading.${index}`} />)}
 
 					{teamStandings &&

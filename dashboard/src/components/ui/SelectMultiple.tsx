@@ -48,9 +48,9 @@ export default function SelectMultiple<T>({ placeholder, options, selected, setS
 					"z-50 mt-1 transition duration-100 ease-in data-leave:data-closed:opacity-0",
 				)}
 			>
-				{filteredOptions.slice(0, 5).map((option, idx) => (
+				{filteredOptions.slice(0, 5).map((option) => (
 					<ComboboxOption
-						key={idx}
+						key={option.label}
 						value={option.value}
 						className="group flex cursor-pointer items-center gap-2 rounded-lg px-3 py-1.5 select-none data-focus:bg-white/10"
 					>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import type { MessageInitial, MessageUpdate } from "@/types/message.type";
 
@@ -11,6 +11,13 @@ type Props = {
 
 export const useSocket = ({ handleInitial, handleUpdate }: Props) => {
 	const [connected, setConnected] = useState<boolean>(false);
+	const handleInitialRef = useRef(handleInitial);
+	const handleUpdateRef = useRef(handleUpdate);
+
+	useEffect(() => {
+		handleInitialRef.current = handleInitial;
+		handleUpdateRef.current = handleUpdate;
+	});
 
 	useEffect(() => {
 		const sse = new EventSource(`${env.NEXT_PUBLIC_LIVE_URL}/api/realtime`);
@@ -18,16 +25,17 @@ export const useSocket = ({ handleInitial, handleUpdate }: Props) => {
 		sse.onerror = () => setConnected(false);
 		sse.onopen = () => setConnected(true);
 
-		sse.addEventListener("initial", (message) => {
-			handleInitial(JSON.parse(message.data));
-		});
+		const onInitial = (message: MessageEvent) => handleInitialRef.current(JSON.parse(message.data));
+		const onUpdate = (message: MessageEvent) => handleUpdateRef.current(JSON.parse(message.data));
 
-		sse.addEventListener("update", (message) => {
-			handleUpdate(JSON.parse(message.data));
-		});
+		sse.addEventListener("initial", onInitial);
+		sse.addEventListener("update", onUpdate);
 
-		return () => sse.close();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		return () => {
+			sse.removeEventListener("initial", onInitial);
+			sse.removeEventListener("update", onUpdate);
+			sse.close();
+		};
 	}, []);
 
 	return { connected };

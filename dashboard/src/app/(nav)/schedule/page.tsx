@@ -34,6 +34,7 @@ const RoundLoading = () => {
 
 			<div className="grid grid-cols-3 gap-8 pt-1">
 				{Array.from({ length: 3 }).map((_, i) => (
+					// eslint-disable-next-line @eslint-react/no-array-index-key
 					<div key={`day.${i}`} className="grid grid-rows-2 gap-2">
 						<div className="h-12 w-full animate-pulse rounded-md bg-zinc-800" />
 						<div className="h-12 w-full animate-pulse rounded-md bg-zinc-800" />
@@ -61,6 +62,7 @@ const FullScheduleLoading = () => {
 	return (
 		<div className="mb-20 grid grid-cols-1 gap-8 md:grid-cols-2">
 			{Array.from({ length: 6 }).map((_, i) => (
+				// eslint-disable-next-line @eslint-react/no-array-index-key
 				<RoundLoading key={`round.${i}`} />
 			))}
 		</div>

@@ -170,7 +170,7 @@ export const useDataEngine = ({ updateState, updatePosition, updateCarData }: Pr
 	useEffect(() => {
 		intervalRef.current = setInterval(handleCurrentState, UPDATE_MS);
 		return () => (intervalRef.current ? clearInterval(intervalRef.current) : void 0);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		// eslint-disable-next-line @eslint-react/exhaustive-deps
 	}, []);
 
 	return {

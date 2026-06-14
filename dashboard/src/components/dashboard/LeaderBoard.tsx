@@ -19,6 +19,7 @@ export default function LeaderBoard() {
 			{showTableHeader && <TableHeaders />}
 
 			{(!drivers || !driversTiming) &&
+				// eslint-disable-next-line @eslint-react/no-array-index-key
 				new Array(20).fill("").map((_, index) => <SkeletonDriver key={`driver.loading.${index}`} />)}
 
 			<LayoutGroup key="drivers">
@@ -94,6 +95,7 @@ const SkeletonDriver = () => {
 			</div>
 
 			{new Array(2).fill(null).map((_, index) => (
+				// eslint-disable-next-line @eslint-react/no-array-index-key
 				<div className="flex w-full flex-col gap-1" key={`skeleton.${index}`}>
 					<div className={clsx(animateClass, "h-4!")} />
 					<div className={clsx(animateClass, "h-3! w-2/3")} />
@@ -107,6 +109,7 @@ const SkeletonDriver = () => {
 
 			<div className="flex w-full gap-1">
 				{new Array(3).fill(null).map((_, index) => (
+					// eslint-disable-next-line @eslint-react/no-array-index-key
 					<div className="flex w-full flex-col gap-1" key={`skeleton.sector.${index}`}>
 						<div className={clsx(animateClass, "h-4!")} />
 						<div className={clsx(animateClass, "h-3! w-2/3")} />
