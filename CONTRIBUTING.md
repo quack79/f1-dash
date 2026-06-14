@@ -11,15 +11,15 @@ To get started with the frontend do the following:
 
 > [!NOTE]
 > You will need multiple terminal sessions, if you want to run everything,
-> you will need 4 sessions. (frontend, live backend, api backend, simulator).
+> you will need 4 sessions. (dashboard, realtime backend, api backend, simulator).
 > Also the following commands assume Linux, macOS or WSL. Windows commands may differ.
 
 ```bash
 # Clone the repository or your fork
-git clone git@github.com:slowlydev/f1-dash.git
+git clone https://github.com/slowlydev/f1-dash.git
 
 # Go to the frontend
-cd dash/
+cd dashboard/
 
 # Install the correct node version using nvm, fnm or nvm-windows
 nvm install
@@ -52,8 +52,8 @@ rustup toolchain install
 # Copy the env example and maybe adjust envs if some ports are already in use
 cp .env.example .env
 
-# To start the live backend which handles the realtime part
-cargo r -p live
+# To start the realtime backend which handles the live part
+cargo r -p realtime
 
 # To start the api backend which handles the schedule
 cargo r -p api

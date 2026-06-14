@@ -12,11 +12,13 @@ use tokio_tungstenite::tungstenite::{Message, client::IntoClientRequest, http::R
 use tracing::{debug, error, info};
 use uuid::Uuid;
 
+/// ASCII Record Separator — used to delimit SignalR Core JSON messages.
 const RECORD_SEPARATOR: &str = "\u{001E}";
-
+/// Message type constants (SignalR Core Hub Protocol)
 const INVOCATION: i32 = 1;
 const COMPLETION: i32 = 3;
 
+// ──────────────────────────── Negotiation ────────────────────────────
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct NegotiationResponse {
@@ -30,8 +32,14 @@ struct Negotiation {
     cookie: String,
 }
 
+/// Perform the SignalR Core negotiation handshake.
+///
+/// 1. Pre-flight OPTIONS to obtain the AWSALBCORS cookie.
+/// 2. POST to /negotiate to get the connection token.
 async fn negotiate(base_url: &str) -> Result<Negotiation, anyhow::Error> {
     let negotiate_url = format!("https://{}/negotiate", base_url);
+
+    // Step 1: OPTIONS pre-flight to get AWSALBCORS cookie
     let client = reqwest::Client::new();
 
     let options_res = client
@@ -47,6 +55,7 @@ async fn negotiate(base_url: &str) -> Result<Negotiation, anyhow::Error> {
 
     debug!(?cookie, "obtained AWSALBCORS cookie");
 
+    // Step 2: POST negotiate with negotiateVersion=1
     let url = Url::parse_with_params(&negotiate_url, &[("negotiateVersion", "1")])?;
     let mut req = client.post(url);
     if !cookie.is_empty() {
@@ -59,7 +68,8 @@ async fn negotiate(base_url: &str) -> Result<Negotiation, anyhow::Error> {
 
     if body.trim().is_empty() {
         return Err(anyhow::anyhow!(
-            "SignalR negotiate returned empty response (HTTP {status})"
+            "SignalR Core negotiate returned empty response (HTTP {status}). \
+             There may be no active session."
         ));
     }
 
@@ -78,6 +88,8 @@ async fn negotiate(base_url: &str) -> Result<Negotiation, anyhow::Error> {
     })
 }
 
+// ──────────────────────────── WebSocket Types ────────────────────────────
+
 type WsStream =
     tokio_tungstenite::WebSocketStream<tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>>;
 
@@ -85,14 +97,18 @@ pub struct SignalrClient {
     pub stream: WsStream,
 }
 
+// ──────────────────────────── Create Client ────────────────────────────
+
 pub async fn create_client(base_url: &str, _hub: &str) -> Result<SignalrClient, anyhow::Error> {
     let negotiation = negotiate(base_url).await?;
 
+    // Build the WebSocket URL
     let mut ws_url = Url::parse(&format!("wss://{}", base_url))?;
     if let Some(ref token) = negotiation.connection_token {
         ws_url.query_pairs_mut().append_pair("id", token);
     }
 
+    // Allow dev override
     let ws_url = match env::var_os("F1_DEV_URL") {
         Some(env_url) => Url::from_str(&env_url.into_string().unwrap())?,
         None => ws_url,
@@ -115,9 +131,11 @@ pub async fn create_client(base_url: &str, _hub: &str) -> Result<SignalrClient, 
     let (mut stream, res) = tokio_tungstenite::connect_async(req).await?;
     debug!(?res, "ws connected");
 
+    // ── SignalR Core Handshake ──
     let json = serialize(&serde_json::json!({"protocol": "json", "version": 1}))?;
     stream.send(Message::text(json)).await?;
 
+    // Receive handshake response (should be {}\u{001E} for success)
     let handshake_response = stream
         .next()
         .await
@@ -150,6 +168,7 @@ pub async fn create_client(base_url: &str, _hub: &str) -> Result<SignalrClient, 
     Ok(SignalrClient { stream })
 }
 
+// ──────────────────────────── SignalR Core Message Types ────────────────────────────
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 struct Completion {
@@ -176,6 +195,7 @@ struct FeedMessage {
     arguments: (String, Value, String),
 }
 
+// ──────────────────────────── Subscribe ────────────────────────────
 pub async fn subscribe(
     client: &mut SignalrClient,
     topics: &[&str],
@@ -200,6 +220,7 @@ pub async fn subscribe(
 
     debug!("subscribe invocation sent, waiting for completion...");
 
+    // Wait for the Completion response (type 3) with our invocation ID
     loop {
         let response = client
             .stream
@@ -255,12 +276,18 @@ fn strip_record_separator(input: &str) -> &str {
     input.trim_end_matches(RECORD_SEPARATOR)
 }
 
+// ──────────────────────────── Public Data Types ────────────────────────────
 pub struct UpdateArgs {
     pub topic: String,
     pub data: serde_json::Value,
     pub timestamp: String,
 }
 
+// ──────────────────────────── Listen (structured) ────────────────────────────
+
+/// Listen to WebSocket messages and parse them into structured UpdateArgs.
+/// In SignalR Core, feed updates arrive as Invocation messages (type 1)
+/// with target "feed" and arguments [topic, data, timestamp].
 pub fn listen(client: SignalrClient) -> impl Stream<Item = Vec<UpdateArgs>> {
     client.stream.filter_map(|message| match message {
         Ok(Message::Text(txt)) => {
@@ -308,6 +335,10 @@ pub fn listen(client: SignalrClient) -> impl Stream<Item = Vec<UpdateArgs>> {
     })
 }
 
+// ──────────────────────────── Listen Raw ────────────────────────────
+
+/// Listen to raw WebSocket messages without parsing them.
+/// Returns the raw text messages as-is, useful for saving to a file for replay.
 pub fn listen_raw(client: SignalrClient) -> impl Stream<Item = String> {
     client.stream.filter_map(|message| match message {
         Ok(Message::Text(txt)) => Some(txt.to_string()),

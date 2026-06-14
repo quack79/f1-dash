@@ -13,11 +13,16 @@ mod services {
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
+    eprintln!("[realtime] binary started");
+    eprintln!("[realtime] ADDRESS={:?}", std::env::var("ADDRESS"));
+    eprintln!("[realtime] ORIGIN={:?}", std::env::var("ORIGIN"));
+    eprintln!("[realtime] RUST_LOG={:?}", std::env::var("RUST_LOG"));
+
     tracing_subscriber();
 
     let state_service = StateService::new();
 
-    let (sender, _reciver) = broadcast::channel::<String>(16);
+    let (sender, _) = broadcast::channel::<String>(16);
 
     {
         let state_service = state_service.clone();
