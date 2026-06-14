@@ -3,7 +3,6 @@ import Image from "next/image";
 import Note from "@/components/Note";
 import DriverDRS from "@/components/driver/DriverDRS";
 import DriverTire from "@/components/driver/DriverTire";
-import DriverPedals from "@/components/driver/DriverPedals";
 import TemperatureComplication from "@/components/complications/Temperature";
 import HumidityComplication from "@/components/complications/Humidity";
 import WindSpeedComplication from "@/components/complications/WindSpeed";
