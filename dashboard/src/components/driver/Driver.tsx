@@ -15,7 +15,6 @@ import DriverTire from "./DriverTire";
 import DriverMiniSectors from "./DriverMiniSectors";
 import DriverLapTime from "./DriverLapTime";
 import DriverInfo from "./DriverInfo";
-import DriverCarMetrics from "./DriverCarMetrics";
 
 type Props = {
 	position: number;
@@ -81,8 +80,6 @@ export default function Driver({ driver, timingDriver, position }: Props) {
 				<DriverGap timingDriver={timingDriver} sessionPart={sessionPart} />
 				<DriverLapTime last={timingDriver.LastLapTime} best={timingDriver.BestLapTime} hasFastest={hasFastest} />
 				<DriverMiniSectors sectors={timingDriver.Sectors} bestSectors={timingStatsDriver?.BestSectors} />
-
-				{carMetrics && carData && <DriverCarMetrics carData={carData} />}
 			</div>
 		</motion.div>
 	);

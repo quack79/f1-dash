@@ -7,9 +7,7 @@ import type { MessageInitial, MessageUpdate } from "@/types/message.type";
 
 import { inflate } from "@/lib/inflate";
 import { utcToLocalMs } from "@/lib/utcToLocalMs";
-
 import { useSettingsStore } from "@/stores/useSettingsStore";
-
 import { useBuffer } from "@/hooks/useBuffer";
 import { useStatefulBuffer } from "@/hooks/useStatefulBuffer";
 
@@ -172,7 +170,6 @@ export const useDataEngine = ({ updateState, updatePosition, updateCarData }: Pr
 	useEffect(() => {
 		intervalRef.current = setInterval(handleCurrentState, UPDATE_MS);
 		return () => (intervalRef.current ? clearInterval(intervalRef.current) : void 0);
-		// TODO investigate if this might have performance issues
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 

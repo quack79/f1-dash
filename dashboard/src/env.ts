@@ -2,13 +2,7 @@ import { z } from "zod";
 
 const server = z.object({
 	NODE_ENV: z.enum(["development", "test", "production"]),
-
 	API_URL: z.string().min(1).includes("http"),
-
-	TRACKING_ID: z.string().optional(),
-	TRACKING_URL: z.string().includes("http").optional(),
-
-	DISABLE_IFRAME: z.string().optional(),
 });
 
 const client = z.object({
@@ -17,14 +11,7 @@ const client = z.object({
 
 const processEnv = {
 	NODE_ENV: process.env.NODE_ENV,
-
 	API_URL: process.env.API_URL,
-
-	TRACKING_ID: process.env.TRACKING_ID,
-	TRACKING_URL: process.env.TRACKING_URL,
-
-	DISABLE_IFRAME: process.env.DISABLE_IFRAME,
-
 	NEXT_PUBLIC_LIVE_URL: process.env.NEXT_PUBLIC_LIVE_URL,
 };
 

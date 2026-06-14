@@ -20,7 +20,8 @@ export default function Page() {
 						<Map viewBoxBottomPadding={250} />
 					</div>
 
-				<div className="min-h-80 flex-1 overflow-y-auto rounded-lg border border-zinc-800 p-2 2xl:min-h-0">
+					<div className="min-h-80 flex-1 overflow-y-auto rounded-lg border border-zinc-800 p-2 2xl:min-h-0">
+						<PanelHeading>Race Control</PanelHeading>
 						<RaceControl />
 					</div>
 				</div>
@@ -28,15 +29,25 @@ export default function Page() {
 
 			<div className="grid grid-cols-1 gap-2 divide-y divide-zinc-800 *:h-120 *:overflow-y-auto *:rounded-lg *:border *:border-zinc-800 *:p-2 md:divide-y-0 lg:grid-cols-2">
 				<div>
+					<PanelHeading>Team Radio</PanelHeading>
 					<TeamRadios />
 				</div>
 
 				<div>
+					<PanelHeading>Violations</PanelHeading>
 					<TrackViolations />
 				</div>
 			</div>
 
 			<Footer />
 		</div>
+	);
+}
+
+function PanelHeading({ children }: { children: string }) {
+	return (
+		<h2 className="sticky -top-2 z-10 -mx-2 -mt-2 mb-2 border-b border-zinc-800 px-2 py-2 text-sm font-medium text-zinc-300 backdrop-blur">
+			{children}
+		</h2>
 	);
 }

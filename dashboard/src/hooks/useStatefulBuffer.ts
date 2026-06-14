@@ -1,7 +1,5 @@
 import { useRef } from "react";
-
 import { merge } from "@/lib/merge";
-
 import { useBuffer } from "@/hooks/useBuffer";
 
 import type { RecursivePartial } from "@/types/message.type";

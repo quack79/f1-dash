@@ -32,5 +32,5 @@ export default function DataWeatherInfo() {
 }
 
 function Loading() {
-	return <div className="h-[55px] w-[55px] animate-pulse rounded-full bg-zinc-800" />;
+	return <div className="h-13.75 w-13.75 animate-pulse rounded-full bg-zinc-800" />;
 }

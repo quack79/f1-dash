@@ -16,9 +16,6 @@ import SelectMultiple from "@/components/ui/SelectMultiple";
 
 export default function FavoriteDrivers() {
 	const [drivers, setDrivers] = useState<Driver[] | null>(null);
-
-	// TODO handle loading state
-	// TODO handle error state
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const [error, setError] = useState<string | null>(null);
 

@@ -47,13 +47,13 @@ export default function SessionInfo() {
 						{timingData?.SessionPart ? ` ${sessionPartPrefix(session.Name)}${timingData.SessionPart}` : ""}
 					</h1>
 				) : (
-					<div className="h-4 w-[250px] animate-pulse rounded-md bg-zinc-800" />
+					<div className="h-4 w-62.5 animate-pulse rounded-md bg-zinc-800" />
 				)}
 
 				{timeRemaining !== undefined ? (
 					<p className="text-2xl leading-none font-extrabold">{timeRemaining}</p>
 				) : (
-					<div className="mt-1 h-6 w-[150px] animate-pulse rounded-md bg-zinc-800 font-semibold" />
+					<div className="mt-1 h-6 w-37.5 animate-pulse rounded-md bg-zinc-800 font-semibold" />
 				)}
 			</div>
 		</div>

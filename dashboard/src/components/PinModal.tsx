@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { useState, useTransition, type FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
-import { motion } from 'motion/react';
+import { useState, useTransition, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
+import { motion } from "motion/react";
 
-import { verifyPin } from '@/app/actions/pin';
+import { verifyPin } from "@/app/actions/pin";
 
 export default function PinModal() {
 	const router = useRouter();
-	const [pin, setPin] = useState('');
+	const [pin, setPin] = useState("");
 	const [error, setError] = useState(false);
 	const [isPending, startTransition] = useTransition();
 
@@ -22,7 +22,7 @@ export default function PinModal() {
 				router.refresh();
 			} else {
 				setError(true);
-				setPin('');
+				setPin("");
 			}
 		});
 	};
@@ -32,7 +32,7 @@ export default function PinModal() {
 			<motion.div
 				initial={{ opacity: 0, scale: 0.9 }}
 				animate={{ opacity: 1, scale: 1 }}
-				transition={{ type: 'spring', duration: 0.5 }}
+				transition={{ type: "spring", duration: 0.5 }}
 				className="w-full max-w-sm rounded-2xl border border-zinc-700 bg-zinc-900/95 p-8 shadow-2xl backdrop-blur-sm"
 			>
 				<div className="mb-6 text-center">
@@ -67,8 +67,8 @@ export default function PinModal() {
 							value={pin}
 							onChange={(e) => setPin(e.target.value)}
 							placeholder="Enter PIN"
-							className={`w-full rounded-lg border bg-zinc-800 px-4 py-3 text-center text-lg tracking-widest text-white placeholder-zinc-500 outline-none transition-colors ${
-								error ? 'border-red-500/60' : 'border-zinc-700 focus:border-zinc-500'
+							className={`w-full rounded-lg border bg-zinc-800 px-4 py-3 text-center text-lg tracking-widest text-white placeholder-zinc-500 transition-colors outline-none ${
+								error ? "border-red-500/60" : "border-zinc-700 focus:border-zinc-500"
 							}`}
 						/>
 						{error && <p className="mt-2 text-center text-sm text-red-400">Incorrect PIN</p>}
@@ -81,7 +81,7 @@ export default function PinModal() {
 						whileTap={{ scale: 0.98 }}
 						className="cursor-pointer rounded-lg bg-zinc-700 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-zinc-600 disabled:cursor-not-allowed disabled:opacity-40"
 					>
-						{isPending ? 'Verifying...' : 'Unlock'}
+						{isPending ? "Verifying..." : "Unlock"}
 					</motion.button>
 				</form>
 			</motion.div>

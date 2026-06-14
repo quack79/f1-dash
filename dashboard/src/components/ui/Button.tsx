@@ -11,12 +11,14 @@ type Props = {
 };
 
 export default function Button({ children, onClick, className }: Props) {
-	// TODO add hover effect
 	return (
 		<motion.button
 			whileHover={{ scale: 1.05 }}
 			whileTap={{ scale: 0.95 }}
-			className={clsx(className, "cursor-pointer rounded-lg bg-zinc-800 p-2 text-center leading-none text-white")}
+			className={clsx(
+				className,
+				"cursor-pointer rounded-lg bg-zinc-800 p-2 text-center leading-none text-white transition-colors hover:bg-zinc-700",
+			)}
 			onClick={onClick}
 		>
 			{children}

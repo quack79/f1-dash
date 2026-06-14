@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-
 import { animate } from "motion";
 
 export const useAnimatedNumber = (value: number) => {

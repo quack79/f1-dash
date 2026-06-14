@@ -99,8 +99,8 @@ export default function HelpPage() {
 			<h2 className="my-4 text-2xl">PIT Status</h2>
 
 			<p className="mb-4">
-				Each driver in the leaderboard has a PIT status indicator. It shows whether a driver is in the pit
-				lane or leaving it.
+				Each driver in the leaderboard has a PIT status indicator. It shows whether a driver is in the pit lane or
+				leaving it.
 			</p>
 
 			<p className="mb-4">
@@ -110,7 +110,7 @@ export default function HelpPage() {
 			<div className="mb-4 flex flex-col gap-4">
 				<div className="flex items-center gap-2">
 					<div className="w-16">
-						<DriverDRS on={false} possible={false} inPit={false} pitOut={false} />
+						<DriverDRS inPit={false} pitOut={false} />
 					</div>
 
 					<p>Out on track</p>
@@ -118,7 +118,7 @@ export default function HelpPage() {
 
 				<div className="flex items-center gap-2">
 					<div className="w-16">
-						<DriverDRS on={false} possible={false} inPit={true} pitOut={false} />
+						<DriverDRS inPit={true} pitOut={false} />
 					</div>
 
 					<p>In the pit lane or leaving</p>

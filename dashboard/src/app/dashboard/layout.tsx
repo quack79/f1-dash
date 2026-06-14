@@ -1,8 +1,8 @@
-import { type ReactNode } from 'react';
-import { cookies } from 'next/headers';
+import { type ReactNode } from "react";
+import { cookies } from "next/headers";
 
-import DashboardClientLayout from './DashboardClientLayout';
-import PinModal from '@/components/PinModal';
+import DashboardClientLayout from "./DashboardClientLayout";
+import PinModal from "@/components/PinModal";
 
 type Props = {
 	children: ReactNode;
@@ -18,7 +18,7 @@ export default async function DashboardLayout({ children }: Props) {
 
 	// PIN is configured — check the cookie.
 	const cookieStore = await cookies();
-	const pinCookie = cookieStore.get('f1-dash-pin');
+	const pinCookie = cookieStore.get("f1-dash-pin");
 	const isAuthenticated = pinCookie?.value === requiredPin;
 
 	if (isAuthenticated) {
@@ -29,7 +29,7 @@ export default async function DashboardLayout({ children }: Props) {
 	return (
 		<div className="relative h-screen w-full overflow-hidden">
 			{/* Blurred dummy background that hints at the dashboard UI */}
-			<div className="pointer-events-none absolute inset-0 select-none blur-xl brightness-50">
+			<div className="pointer-events-none absolute inset-0 blur-xl brightness-50 select-none">
 				<div className="flex h-full w-full md:pt-2 md:pr-2 md:pb-2">
 					{/* Fake sidebar */}
 					<div className="hidden h-full w-56 shrink-0 border-r border-zinc-800 md:block" />

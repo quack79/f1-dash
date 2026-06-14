@@ -27,7 +27,7 @@ target "f1-dash" {
   context = "./dashboard"
   dockerfile = "dockerfile"
 
-  # tags = ["ghcr.io/slowlydev/f1-dash:latest"]
+  # tags = ["ghcr.io/quack79/f1-dash:latest"]
 }
 
 target "f1-dash-api" {
@@ -37,7 +37,7 @@ target "f1-dash-api" {
   dockerfile = "dockerfile"
   target = "api"
 
-  # tags = ["ghcr.io/slowlydev/f1-dash-api:latest"]
+  # tags = ["ghcr.io/quack79/f1-dash-api:latest"]
 }
 
 target "f1-dash-realtime" {
@@ -47,5 +47,5 @@ target "f1-dash-realtime" {
   dockerfile = "dockerfile"
   target = "realtime"
 
-  # tags = ["ghcr.io/slowlydev/f1-dash-realtime:latest"]
+  # tags = ["ghcr.io/quack79/f1-dash-realtime:latest"]
 }

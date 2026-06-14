@@ -41,16 +41,6 @@ type Props = {
 };
 
 export default function Sidebar({ connected }: Props) {
-	// const favoriteDrivers = useSettingsStore((state) => state.favoriteDrivers);
-	// const drivers = useDataStore((state) => state.driverList);
-
-	// const driverItems = drivers
-	// 	? favoriteDrivers.map((nr) => ({
-	// 			href: `/dashboard/driver/${nr}`,
-	// 			name: drivers[nr].fullName,
-	// 		}))
-	// 	: null;
-
 	const { opened, pinned } = useSidebarStore();
 	const close = useSidebarStore((state) => state.close);
 	const open = useSidebarStore((state) => state.open);
@@ -125,24 +115,10 @@ export default function Sidebar({ connected }: Props) {
 						))}
 					</div>
 
-					{/* <p className="mt-4 p-2 text-sm text-zinc-500">Favorite Drivers</p>
-
-					<div className="flex flex-col gap-1">
-						{driverItems === null && (
-							<>
-								<div className="h-8 animate-pulse rounded-lg bg-zinc-800" />
-								<div className="h-8 animate-pulse rounded-lg bg-zinc-800" />
-							</>
-						)}
-						{driverItems !== null && driverItems.length === 0 && <div className="p-2">No favorites</div>}
-						{driverItems?.map((item) => <Item key={item.href} item={item} />)}
-					</div> */}
-
 					<p className="mt-4 p-2 text-sm text-zinc-500">General</p>
 
 					<div className="flex flex-col gap-1">
 						<Item item={{ href: "/dashboard/settings", name: "Settings" }} />
-
 						<Item target="_blank" item={{ href: "/schedule", name: "Schedule" }} />
 						<Item target="_blank" item={{ href: "/help", name: "Help" }} />
 					</div>
