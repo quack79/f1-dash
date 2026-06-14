@@ -344,6 +344,9 @@ echo -e "\n${BOLD}Ctrl+C to stop all services.${RESET}\n"
 EXITED_PID=""
 EXIT_STATUS=0
 wait -n -p EXITED_PID "${PIDS[@]}" 2>/dev/null || EXIT_STATUS=$?
+if [[ -z "${EXITED_PID-}" ]]; then
+  exit "$EXIT_STATUS"
+fi
 EXITED_SERVICE="$(pid_name "$EXITED_PID")"
 echo -e "\n${RED}${BOLD}[dev]${RESET} ${EXITED_SERVICE} terminated unexpectedly with exit code ${EXIT_STATUS}. Stopping the rest..."
 exit "$EXIT_STATUS"
