@@ -26,6 +26,7 @@ export default function TeamRadios() {
 				<AnimatePresence>
 					{teamRadios.Captures.sort(sortUtc)
 						.slice(0, 20)
+						.filter((teamRadio) => drivers[teamRadio.RacingNumber] !== undefined)
 						.map((teamRadio, i) => (
 							<RadioMessage
 								key={`radio.${i}`}

@@ -100,6 +100,14 @@ pub struct SignalrClient {
 // ──────────────────────────── Create Client ────────────────────────────
 
 pub async fn create_client(base_url: &str, _hub: &str) -> Result<SignalrClient, anyhow::Error> {
+    // Dev mode: connect directly to the simulator, skipping negotiate + handshake.
+    if let Some(dev_url) = env::var("F1_DEV_URL").ok() {
+        let url = Url::from_str(&dev_url)?;
+        info!("dev mode: connecting directly to {url}");
+        let (stream, _) = tokio_tungstenite::connect_async(url.into_client_request()?).await?;
+        return Ok(SignalrClient { stream });
+    }
+
     let negotiation = negotiate(base_url).await?;
 
     // Build the WebSocket URL
@@ -107,12 +115,6 @@ pub async fn create_client(base_url: &str, _hub: &str) -> Result<SignalrClient, 
     if let Some(ref token) = negotiation.connection_token {
         ws_url.query_pairs_mut().append_pair("id", token);
     }
-
-    // Allow dev override
-    let ws_url = match env::var_os("F1_DEV_URL") {
-        Some(env_url) => Url::from_str(&env_url.into_string().unwrap())?,
-        None => ws_url,
-    };
 
     info!("connecting to {ws_url}");
 
@@ -200,6 +202,12 @@ pub async fn subscribe(
     client: &mut SignalrClient,
     topics: &[&str],
 ) -> Result<Value, anyhow::Error> {
+    // Dev mode: simulator streams raw feed messages; skip the subscribe ceremony
+    // and return an empty initial state — updates will build state from scratch.
+    if env::var("F1_DEV_URL").is_ok() {
+        return Ok(Value::Object(Default::default()));
+    }
+
     let invocation_id = Uuid::new_v4().to_string();
 
     let invoke = InvocationMessage {

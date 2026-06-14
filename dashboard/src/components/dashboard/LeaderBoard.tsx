@@ -26,6 +26,7 @@ export default function LeaderBoard() {
 					<AnimatePresence>
 						{Object.values(driversTiming.Lines)
 							.sort(sortPos)
+							.filter((timingDriver) => drivers[timingDriver.RacingNumber] !== undefined)
 							.map((timingDriver, index) => (
 								<Driver
 									key={`leaderBoard.driver.${timingDriver.RacingNumber}`}

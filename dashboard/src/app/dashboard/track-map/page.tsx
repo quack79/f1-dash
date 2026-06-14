@@ -30,6 +30,7 @@ export default function TrackMap() {
 					<AnimatePresence>
 						{Object.values(driversTiming.Lines)
 							.sort(sortPos)
+							.filter((timingDriver) => drivers[timingDriver.RacingNumber] !== undefined)
 							.map((timingDriver, index) => (
 								<TrackMapDriver
 									key={`trackmap.driver.${timingDriver.RacingNumber}`}

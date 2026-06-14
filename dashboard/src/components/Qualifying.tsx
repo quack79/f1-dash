@@ -34,13 +34,14 @@ export default function Qualifying() {
 				{drivers &&
 					qualifyingDrivers
 						.sort(sortQuali)
+						.filter((timingDriver) => drivers[timingDriver.RacingNumber] !== undefined)
 						.map((timingDriver) => (
 							<QualifyingDriver
 								key={`qualifying.driver.${timingDriver.RacingNumber}`}
 								driver={drivers[timingDriver.RacingNumber]}
 								timingDriver={timingDriver}
 								appTimingDriver={appDriversTiming?.Lines[timingDriver.RacingNumber]}
-								currentBestName={comparingDriver ? drivers[comparingDriver?.RacingNumber].Tla : undefined}
+								currentBestName={comparingDriver ? drivers[comparingDriver.RacingNumber]?.Tla : undefined}
 								currentBestTime={comparingDriver ? comparingDriver.BestLapTime.Value : undefined}
 							/>
 						))}

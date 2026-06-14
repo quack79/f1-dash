@@ -11,11 +11,32 @@ use axum::{
     routing::get,
 };
 use futures::{SinkExt, StreamExt};
+use serde_json::Value;
 use tokio::net::TcpListener;
 use tracing::{debug, error, info};
 
 pub struct AppState {
     lines: Vec<String>,
+}
+
+// Old ASP.NET SignalR: {"M":[{"H":"hub","M":"method","A":[args...]}]}
+// SignalR Core (what `listen` expects): {"type":1,"target":"method","arguments":[args...]}\u{001E}
+fn to_signalr_core(line: &str) -> Option<String> {
+    let parsed: Value = serde_json::from_str(line).ok()?;
+    let messages = parsed.get("M")?.as_array()?;
+
+    let mut out = String::new();
+    for msg in messages {
+        if msg.get("M")?.as_str()? != "feed" {
+            continue;
+        }
+        let args = msg.get("A")?;
+        let core = serde_json::json!({"type": 1, "target": "feed", "arguments": args});
+        out.push_str(&core.to_string());
+        out.push('\u{001E}');
+    }
+
+    if out.is_empty() { None } else { Some(out) }
 }
 
 pub async fn run(lines: Vec<String>) -> Result<(), Error> {
@@ -49,8 +70,11 @@ async fn handle_ws(socket: WebSocket, state: Arc<AppState>) {
 
             debug!(amount_of_updates, "starting to send updates");
 
-            for update in state.lines.iter() {
-                match tx.send(Message::text(update)).await {
+            for line in state.lines.iter() {
+                let Some(converted) = to_signalr_core(line) else {
+                    continue;
+                };
+                match tx.send(Message::text(converted)).await {
                     Ok(_) => {}
                     Err(e) => {
                         error!("error sending ws message: {}", e);
