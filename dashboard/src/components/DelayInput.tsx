@@ -19,6 +19,7 @@ export default function DelayInput({ className, saveDelay }: Props) {
 	const [delayState, setDelayState] = useState<string>(currentDelay.toString());
 
 	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const isPausedRef = useRef<boolean>(isPaused);
 
 	const updateDelay = (updateInput: boolean = false) => {
 		const delay = delayState ? Math.max(parseInt(delayState), 0) : 0;
@@ -34,14 +35,19 @@ export default function DelayInput({ className, saveDelay }: Props) {
 	}, [delayState]);
 
 	useEffect(() => {
-		if (!isPaused) setDelayState(currentDelay.toString());
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		isPausedRef.current = isPaused;
 	}, [isPaused]);
 
 	useEffect(() => {
-		if (isPaused) setDelayState(currentDelay.toString());
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [currentDelay]);
+		const unsubscribe = useSettingsStore.subscribe(
+			(state) => state.delay,
+			(delay) => {
+				if (isPausedRef.current) setDelayState(delay.toString());
+			},
+		);
+
+		return unsubscribe;
+	}, []);
 
 	const handleChange = (v: string) => {
 		setDelayState(v);
@@ -57,7 +63,7 @@ export default function DelayInput({ className, saveDelay }: Props) {
 			inputMode="numeric"
 			min={0}
 			placeholder="0s"
-			value={delayState}
+			value={isPaused ? currentDelay.toString() : delayState}
 			onChange={(e) => handleChange(e.target.value)}
 			onKeyDown={(e) => e.code == "Enter" && updateDelay(true)}
 			onBlur={() => updateDelay(true)}

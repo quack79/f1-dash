@@ -47,13 +47,19 @@ export const useDataEngine = ({ updateState, updatePosition, updateCarData }: Pr
 
 	const delayRef = useRef<number>(0);
 
-	useSettingsStore.subscribe(
-		(state) => state.delay,
-		(delay) => (delayRef.current = delay),
-		{ fireImmediately: true },
-	);
-
 	const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+	useEffect(() => {
+		const unsubscribe = useSettingsStore.subscribe(
+			(state) => state.delay,
+			(delay) => {
+				delayRef.current = delay;
+			},
+			{ fireImmediately: true },
+		);
+
+		return unsubscribe;
+	}, []);
 
 	const handleInitial = ({ CarDataZ: carZ, PositionZ: posZ, ...initial }: MessageInitial) => {
 		updateState(initial);
