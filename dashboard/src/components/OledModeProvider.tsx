@@ -12,6 +12,10 @@ export default function OledModeProvider({ children }: Props) {
 	const oledMode = useSettingsStore((state) => state.oledMode);
 
 	useEffect(() => {
+		useSettingsStore.persist.rehydrate();
+	}, []);
+
+	useEffect(() => {
 		document.documentElement.classList.toggle("bg-zinc-950", !oledMode);
 		document.documentElement.classList.toggle("bg-black", oledMode);
 	}, [oledMode]);

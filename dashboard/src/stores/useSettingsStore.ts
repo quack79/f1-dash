@@ -93,6 +93,7 @@ export const useSettingsStore = create<SettingsStore>()(
 			{
 				name: "settings-storage",
 				storage: createJSONStorage(() => localStorage),
+				skipHydration: true,
 				onRehydrateStorage: (state) => {
 					return () => state.setDelayIsPaused(false);
 				},

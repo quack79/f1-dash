@@ -4,7 +4,7 @@ export const useWakeLock = () => {
 	const wakeLock = useRef<null | WakeLockSentinel>(null);
 
 	useEffect(() => {
-		if (typeof window != undefined) {
+		if (typeof window !== "undefined") {
 			if (!window.isSecureContext) return;
 
 			if (window.location.hostname === "localhost") return;
