@@ -76,7 +76,7 @@ export default function SettingsPage() {
 						}}
 					/>
 					<Slider
-						className="!w-52"
+						className="w-52!"
 						value={settings.raceControlChimeVolume}
 						setValue={(v) => settings.setRaceControlChimeVolume(v)}
 					/>

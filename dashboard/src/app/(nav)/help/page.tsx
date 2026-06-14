@@ -109,7 +109,7 @@ export default function HelpPage() {
 
 			<div className="mb-4 flex flex-col gap-4">
 				<div className="flex items-center gap-2">
-					<div className="w-[4rem]">
+					<div className="w-16">
 						<DriverDRS on={false} possible={false} inPit={false} pitOut={false} />
 					</div>
 
@@ -117,7 +117,7 @@ export default function HelpPage() {
 				</div>
 
 				<div className="flex items-center gap-2">
-					<div className="w-[4rem]">
+					<div className="w-16">
 						<DriverDRS on={false} possible={false} inPit={true} pitOut={false} />
 					</div>
 

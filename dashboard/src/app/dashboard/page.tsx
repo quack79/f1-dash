@@ -20,13 +20,13 @@ export default function Page() {
 						<Map viewBoxBottomPadding={250} />
 					</div>
 
-					<div className="min-h-[20rem] flex-1 overflow-y-auto rounded-lg border border-zinc-800 p-2 2xl:min-h-0">
+				<div className="min-h-80 flex-1 overflow-y-auto rounded-lg border border-zinc-800 p-2 2xl:min-h-0">
 						<RaceControl />
 					</div>
 				</div>
 			</div>
 
-			<div className="grid grid-cols-1 gap-2 divide-y divide-zinc-800 *:h-[30rem] *:overflow-y-auto *:rounded-lg *:border *:border-zinc-800 *:p-2 md:divide-y-0 lg:grid-cols-2">
+			<div className="grid grid-cols-1 gap-2 divide-y divide-zinc-800 *:h-120 *:overflow-y-auto *:rounded-lg *:border *:border-zinc-800 *:p-2 md:divide-y-0 lg:grid-cols-2">
 				<div>
 					<TeamRadios />
 				</div>
