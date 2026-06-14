@@ -1,17 +1,32 @@
-import nextCoreWebVitals from "eslint-config-next/core-web-vitals";
-import next from "eslint-config-next";
-import nextTypescript from "eslint-config-next/typescript";
-import { FlatCompat } from "@eslint/eslintrc";
+import { defineConfig, globalIgnores } from "eslint/config";
+import eslintReact from "@eslint-react/eslint-plugin";
+import nextPlugin from "@next/eslint-plugin-next";
+import tseslint from "typescript-eslint";
+import prettier from "eslint-plugin-prettier";
+import prettierConfig from "eslint-config-prettier";
 
-const compat = new FlatCompat({
-	// import.meta.dirname is available after Node.js v20.11.0
-	baseDirectory: import.meta.dirname,
-});
+export default defineConfig([
+	// TypeScript recommended rules (parser + base + recommended)
+	...tseslint.configs.recommended,
 
-const eslintConfig = [...nextCoreWebVitals, ...next, ...nextTypescript, ...compat.config({
-    extends: ["prettier"]
-}), {
-    ignores: ["node_modules/**", ".next/**", "out/**", "build/**", "next-env.d.ts"]
-}];
+	// Next.js core-web-vitals rules — registers the @next/next plugin and its rules
+	nextPlugin.configs["core-web-vitals"],
 
-export default eslintConfig;
+	// React + react-hooks + Prettier — applied to every JS/TS source file
+	{
+		files: ["**/*.{js,jsx,mjs,ts,tsx}"],
+		extends: [eslintReact.configs.recommended],
+		plugins: {
+			prettier,
+		},
+		rules: {
+			"prettier/prettier": "error",
+		},
+	},
+
+	// Disable stylistic ESLint rules that conflict with Prettier — must come last
+	prettierConfig,
+
+	// Keep the same global ignores as before (.next/**, out/**, build/**)
+	globalIgnores(["node_modules/**", ".next/**", "out/**", "build/**", "next-env.d.ts"]),
+]);
