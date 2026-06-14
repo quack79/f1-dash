@@ -32,7 +32,7 @@ export default async function DashboardLayout({ children }: Props) {
 			<div className="pointer-events-none absolute inset-0 blur-xl brightness-50 select-none">
 				<div className="flex h-full w-full md:pt-2 md:pr-2 md:pb-2">
 					{/* Fake sidebar */}
-					<div className="hidden h-full w-56 shrink-0 border-r border-zinc-800 md:block" />
+					<div className="hidden h-full w-52 shrink-0 border-r border-zinc-800 md:block" />
 
 					<div className="flex h-full w-full flex-1 flex-col gap-2 p-2">
 						{/* Fake top bar */}

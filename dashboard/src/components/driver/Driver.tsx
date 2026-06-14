@@ -22,10 +22,6 @@ type Props = {
 	timingDriver: TimingDataDriver;
 };
 
-const hasDRS = (drs: number) => drs > 9;
-
-const possibleDRS = (drs: number) => drs === 8;
-
 const inDangerZone = (position: number, sessionPart: number) => {
 	switch (sessionPart) {
 		case 1:
@@ -42,12 +38,7 @@ export default function Driver({ driver, timingDriver, position }: Props) {
 	const sessionPart = useDataStore((state) => state.state?.TimingData?.SessionPart);
 	const timingStatsDriver = useDataStore((state) => state.state?.TimingStats?.Lines[driver.RacingNumber]);
 	const appTimingDriver = useDataStore((state) => state.state?.TimingAppData?.Lines[driver.RacingNumber]);
-	const carData = useDataStore((state) => (state?.carsData ? state.carsData[driver.RacingNumber].Channels : undefined));
-
 	const hasFastest = timingStatsDriver?.PersonalBestLapTime.Position == 1;
-
-	const carMetrics = useSettingsStore((state) => state.carMetrics);
-
 	const favoriteDriver = useSettingsStore((state) => state.favoriteDrivers.includes(driver.RacingNumber));
 
 	return (
@@ -62,19 +53,10 @@ export default function Driver({ driver, timingDriver, position }: Props) {
 		>
 			<div
 				className="grid items-center gap-2"
-				style={{
-					gridTemplateColumns: carMetrics
-						? "5.5rem 3.5rem 5.5rem 4rem 5rem 5.5rem auto 10.5rem"
-						: "5.5rem 3.5rem 5.5rem 4rem 5rem 5.5rem auto",
-				}}
+				style={{ gridTemplateColumns: "5.5rem 3.5rem 5.5rem 4rem 5rem 5.5rem auto" }}
 			>
 				<DriverTag className="min-w-full!" short={driver.Tla} teamColor={driver.TeamColour} position={position} />
-				<DriverDRS
-					on={carData ? hasDRS(carData[45]) : false}
-					possible={carData ? possibleDRS(carData[45]) : false}
-					inPit={timingDriver.InPit}
-					pitOut={timingDriver.PitOut}
-				/>
+				<DriverDRS inPit={timingDriver.InPit} pitOut={timingDriver.PitOut} />
 				<DriverTire stints={appTimingDriver?.Stints} />
 				<DriverInfo timingDriver={timingDriver} gridPos={appTimingDriver ? parseInt(appTimingDriver.GridPos) : 0} />
 				<DriverGap timingDriver={timingDriver} sessionPart={sessionPart} />

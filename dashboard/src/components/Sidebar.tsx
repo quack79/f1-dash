@@ -17,6 +17,8 @@ import DelayInput from "@/components/DelayInput";
 import SidenavButton from "@/components/SidenavButton";
 import DelayTimer from "@/components/DelayTimer";
 
+const SIDEBAR_WIDTH = 208;
+
 const liveTimingItems = [
 	{
 		href: "/dashboard",
@@ -65,7 +67,11 @@ export default function Sidebar({ connected }: Props) {
 
 	return (
 		<div>
-			<motion.div className="hidden md:block" style={{ width: 216 }} animate={{ width: pinned ? 216 : 8 }} />
+			<motion.div
+				className="hidden md:block"
+				style={{ width: SIDEBAR_WIDTH }}
+				animate={{ width: pinned ? SIDEBAR_WIDTH : 8 }}
+			/>
 
 			<AnimatePresence>
 				{opened && (
@@ -85,11 +91,11 @@ export default function Sidebar({ connected }: Props) {
 				onHoverEnd={!pinned ? () => close() : undefined}
 				onHoverStart={!pinned ? () => open() : undefined}
 				//
-				animate={{ left: pinned || opened ? 0 : -216 }}
+				animate={{ left: pinned || opened ? 0 : -SIDEBAR_WIDTH }}
 				transition={{ type: "spring", bounce: 0.1 }}
 			>
 				<nav
-					className={clsx("m-2 flex w-52 flex-col p-2", {
+					className={clsx("m-2 flex w-48 flex-col p-2", {
 						"rounded-lg border border-zinc-800": !pinned,
 						"bg-black": oledMode,
 						"bg-zinc-950": !oledMode,
