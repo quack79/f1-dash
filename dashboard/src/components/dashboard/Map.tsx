@@ -106,9 +106,11 @@ type Corner = {
 
 type Props = {
 	filter?: string[];
+	viewBoxPadding?: number;
+	viewBoxBottomPadding?: number;
 };
 
-export default function Map({ filter }: Props) {
+export default function Map({ filter, viewBoxPadding = SPACE, viewBoxBottomPadding = viewBoxPadding }: Props) {
 	const showCornerNumbers = useSettingsStore((state) => state.showCornerNumbers);
 	const favoriteDrivers = useSettingsStore((state) => state.favoriteDrivers);
 
@@ -165,10 +167,10 @@ export default function Map({ filter }: Props) {
 			const pointsX = rotatedPoints.map((item) => item.x);
 			const pointsY = rotatedPoints.map((item) => item.y);
 
-			const cMinX = Math.min(...pointsX) - SPACE;
-			const cMinY = Math.min(...pointsY) - SPACE;
-			const cWidthX = Math.max(...pointsX) - cMinX + SPACE * 2;
-			const cWidthY = Math.max(...pointsY) - cMinY + SPACE * 2;
+			const cMinX = Math.min(...pointsX) - viewBoxPadding;
+			const cMinY = Math.min(...pointsY) - viewBoxPadding;
+			const cWidthX = Math.max(...pointsX) - cMinX + viewBoxPadding * 2;
+			const cWidthY = Math.max(...pointsY) - cMinY + viewBoxPadding + viewBoxBottomPadding;
 
 			const rotatedFinishLine = rotate(mapJson.x[0], mapJson.y[0], fixedRotation, centerX, centerY);
 
@@ -188,7 +190,7 @@ export default function Map({ filter }: Props) {
 			setFinishLine({ x: rotatedFinishLine.x, y: rotatedFinishLine.y, startAngle });
 			setOriginalTrackPoints(originalPoints);
 		})();
-	}, [circuitKey]);
+	}, [circuitKey, viewBoxBottomPadding, viewBoxPadding]);
 
 	const yellowSectors = useMemo(() => findYellowSectors(raceControlMessages), [raceControlMessages]);
 

@@ -3,8 +3,11 @@
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import clsx from "clsx";
+
+import tagLogo from "public/tag-logo.svg";
 
 import { useSidebarStore } from "@/stores/useSidebarStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
@@ -142,16 +145,11 @@ export default function Sidebar({ connected }: Props) {
 
 						<Item target="_blank" item={{ href: "/schedule", name: "Schedule" }} />
 						<Item target="_blank" item={{ href: "/help", name: "Help" }} />
-						<Item target="_blank" item={{ href: "/", name: "Home" }} />
 					</div>
 
-					<p className="mt-4 p-2 text-sm text-zinc-500">Links</p>
-
-					<div className="flex flex-col gap-1">
-						<Item target="_blank" item={{ href: "https://github.com/slowlydev/f1-dash", name: "Github" }} />
-						<Item target="_blank" item={{ href: "https://discord.gg/unJwu66NuB", name: "Discord" }} />
-						<Item target="_blank" item={{ href: "https://buymeacoffee.com/slowlydev", name: "Buy me a coffee" }} />
-						<Item target="_blank" item={{ href: "https://github.com/sponsors/slowlydev", name: "Sponsor me" }} />
+					<div className="mt-auto flex flex-col gap-3 pt-8 text-sm text-zinc-500">
+						<Image src={tagLogo} alt="f1-dash tag logo" className="h-auto w-28" />
+						<p>Version: {process.env.version}</p>
 					</div>
 				</nav>
 			</motion.div>

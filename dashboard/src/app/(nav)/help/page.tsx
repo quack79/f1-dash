@@ -97,17 +97,15 @@ export default function HelpPage() {
 				</div>
 			</div>
 
-			<h2 className="my-4 text-2xl">DRS & PIT Status</h2>
+			<h2 className="my-4 text-2xl">PIT Status</h2>
 
 			<p className="mb-4">
-				Each driver in the leaderboard has a DRS and PIT status indicator. It shows whether a driver has no DRS, is less
-				than 1 second behind the driver ahead (and has DRS from the detection zone), has DRS active, or is in the pit
+				Each driver in the leaderboard has a PIT status indicator. It shows whether a driver is in the pit
 				lane or leaving it.
 			</p>
 
 			<p className="mb-4">
-				Overall it gives you a quick overview if the driver is going into the pits and might drop a few places behind or
-				if the driver has DRS and a chance to overtake the driver ahead.
+				Overall it gives you a quick overview if the driver is going into the pits and might drop a few places behind.
 			</p>
 
 			<div className="mb-4 flex flex-col gap-4">
@@ -116,23 +114,7 @@ export default function HelpPage() {
 						<DriverDRS on={false} possible={false} inPit={false} pitOut={false} />
 					</div>
 
-					<p>Off: No DRS (default)</p>
-				</div>
-
-				<div className="flex items-center gap-2">
-					<div className="w-[4rem]">
-						<DriverDRS on={false} possible={true} inPit={false} pitOut={false} />
-					</div>
-
-					<p>Possible: Eligible for DRS in the next zone</p>
-				</div>
-
-				<div className="flex items-center gap-2">
-					<div className="w-[4rem]">
-						<DriverDRS on={true} possible={false} inPit={false} pitOut={false} />
-					</div>
-
-					<p>Active: DRS is active</p>
+					<p>Out on track</p>
 				</div>
 
 				<div className="flex items-center gap-2">
@@ -140,7 +122,7 @@ export default function HelpPage() {
 						<DriverDRS on={false} possible={false} inPit={true} pitOut={false} />
 					</div>
 
-					<p>PIT: In the pit lane or leaving</p>
+					<p>In the pit lane or leaving</p>
 				</div>
 			</div>
 
@@ -229,40 +211,6 @@ export default function HelpPage() {
 				</li>
 				<li>If available mini sectors</li>
 			</ul>
-
-			<h2 className="my-4 text-2xl">Driver Pedals</h2>
-
-			<div className="mb-4 flex flex-col gap-4">
-				<div className="flex items-center gap-6">
-					<div className="w-[4rem]">
-						<DriverPedals className="bg-red-500" value={1} maxValue={3} />
-					</div>
-
-					<p>
-						Shows if the driver is braking <span className="text-zinc-500">(on / off)</span>
-					</p>
-				</div>
-
-				<div className="flex items-center gap-6">
-					<div className="w-[4rem]">
-						<DriverPedals className="bg-emerald-500" value={3} maxValue={4} />
-					</div>
-
-					<p>
-						Shows how much the driver is pressing the throttle pedal <span className="text-zinc-500">(0-100%)</span>
-					</p>
-				</div>
-
-				<div className="flex items-center gap-6">
-					<div className="w-[4rem]">
-						<DriverPedals className="bg-blue-500" value={2} maxValue={3} />
-					</div>
-
-					<p>
-						Shows the engine&apos;s RPM <span className="text-zinc-500">(0 - 15&apos;000)</span>
-					</p>
-				</div>
-			</div>
 
 			<h2 className="my-4 text-2xl">Weather</h2>
 

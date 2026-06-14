@@ -11,9 +11,9 @@ export default function NotFound() {
 				<h1 className="my-20 text-center text-5xl font-bold">Page not found</h1>
 
 				<div className="flex flex-wrap gap-4">
-					<Link href="/">
+					<Link href="/dashboard">
 						<Button className="rounded-xl! border-2 border-zinc-700 bg-transparent! p-4 font-medium">
-							Go back to home
+							Go to dashboard
 						</Button>
 					</Link>
 				</div>

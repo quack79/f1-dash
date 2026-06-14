@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 
 type DriverStanding = {
 	position: string;
@@ -131,17 +130,18 @@ export default function Standings() {
 							>
 								<p className="font-bold">{team.position}</p>
 
-								<Image
-									src={`/team-logos/${getLogoFileName(team.Constructor.constructorId)}.svg`}
-									alt={team.Constructor.name}
-									width={24}
-									height={24}
-									className="overflow-hidden rounded-lg object-contain"
-									onError={(e) => {
-										// Fallback if image not found
-										(e.currentTarget as HTMLImageElement).style.visibility = "hidden";
-									}}
-								/>
+								<div className="flex size-6 items-center justify-center overflow-hidden rounded-lg">
+									{/* eslint-disable-next-line @next/next/no-img-element */}
+									<img
+										src={`/team-logos/${getLogoFileName(team.Constructor.constructorId)}.svg`}
+										alt={team.Constructor.name}
+										className="max-h-full max-w-full object-contain"
+										onError={(e) => {
+											// Fallback if image not found
+											(e.currentTarget as HTMLImageElement).style.visibility = "hidden";
+										}}
+									/>
+								</div>
 
 								<p className="truncate">{team.Constructor.name}</p>
 
