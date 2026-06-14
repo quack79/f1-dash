@@ -20,9 +20,12 @@ mod endpoints {
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
+    // Try workspace-root path first, then service-local .env
+    dotenvy::from_filename("api/.env").or_else(|_| dotenvy::dotenv()).ok();
+
     tracing_subscriber();
 
-    let addr = env::var("ADDRESS").unwrap_or_else(|_| "0.0.0.0:10000".to_string());
+    let addr = env::var("ADDRESS").unwrap_or_else(|_| "0.0.0.0:4001".to_string());
 
     let app = Router::new()
         .route("/api/schedule", get(endpoints::schedule::get))

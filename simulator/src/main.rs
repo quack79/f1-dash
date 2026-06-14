@@ -10,6 +10,9 @@ mod save;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
+    // Try workspace-root path first, then service-local .env
+    dotenvy::from_filename("simulator/.env").or_else(|_| dotenvy::dotenv()).ok();
+
     shared::tracing_subscriber();
 
     let command = get_command()

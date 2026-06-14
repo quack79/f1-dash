@@ -13,10 +13,8 @@ mod services {
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    eprintln!("[realtime] binary started");
-    eprintln!("[realtime] ADDRESS={:?}", std::env::var("ADDRESS"));
-    eprintln!("[realtime] ORIGIN={:?}", std::env::var("ORIGIN"));
-    eprintln!("[realtime] RUST_LOG={:?}", std::env::var("RUST_LOG"));
+    // Try workspace-root path first, then service-local .env
+    dotenvy::from_filename("realtime/.env").or_else(|_| dotenvy::dotenv()).ok();
 
     tracing_subscriber();
 

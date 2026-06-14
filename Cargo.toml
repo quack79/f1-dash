@@ -6,3 +6,4 @@ resolver = "2"
 [workspace.dependencies]
 shared = { path = "shared" }
 signalr = { path = "signalr" }
+dotenvy = "0.15"

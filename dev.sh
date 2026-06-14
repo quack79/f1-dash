@@ -53,10 +53,10 @@ prefix_output() {
 }
 
 normalize_env() {
-  [[ -n "${ADDRESS-}" ]] && export ADDRESS="${ADDRESS//$'\r'/}"
-  [[ -n "${ORIGIN-}" ]] && export ORIGIN="${ORIGIN//$'\r'/}"
-  [[ -n "${F1_DEV_URL-}" ]] && export F1_DEV_URL="${F1_DEV_URL//$'\r'/}"
-  [[ -n "${RUST_LOG-}" ]] && export RUST_LOG="${RUST_LOG//$'\r'/}"
+  if [[ -n "${ADDRESS-}" ]]; then export ADDRESS="${ADDRESS//$'\r'/}"; fi
+  if [[ -n "${ORIGIN-}" ]]; then export ORIGIN="${ORIGIN//$'\r'/}"; fi
+  if [[ -n "${F1_DEV_URL-}" ]]; then export F1_DEV_URL="${F1_DEV_URL//$'\r'/}"; fi
+  if [[ -n "${RUST_LOG-}" ]]; then export RUST_LOG="${RUST_LOG//$'\r'/}"; fi
 }
 
 debug_port() {
@@ -125,7 +125,7 @@ run_simulator() {
   set -a; source "$ROOT/simulator/.env" 2>/dev/null || true; set +a
   normalize_env
   export RUST_BACKTRACE=1
-  [[ -z "${RUST_LOG-}" ]] && export RUST_LOG=simulator=debug
+  if [[ -z "${RUST_LOG-}" ]]; then export RUST_LOG=simulator=debug; fi
   echo "[simulator-env] ADDRESS=${ADDRESS-<unset>}"
   echo "[simulator-env] RUST_LOG=${RUST_LOG-<unset>}"
   echo "[simulator-env] replay=${SIMULATOR_REPLAY_PATH}"
@@ -135,7 +135,7 @@ run_simulator() {
 run_realtime() {
   set -a
   source "$ROOT/realtime/.env" 2>/dev/null || true
-  $USE_SIMULATOR && export F1_DEV_URL="ws://127.0.0.1:8000/ws"
+  if $USE_SIMULATOR; then export F1_DEV_URL="ws://127.0.0.1:8000/ws"; fi
   set +a
   normalize_env
   exec "$ROOT/target/debug/realtime"

@@ -7,6 +7,7 @@ authors = ["slowlydev"]
 
 [dependencies]
 shared = { workspace = true }
+dotenvy = { workspace = true }
 axum = { version = "0.8.4", features = ["http2"] }
 tower-http = { version = "0.6.4", features = ["cors"] }
 tokio = { version = "1.45.1", features = ["full"] }

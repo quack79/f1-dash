@@ -148,7 +148,7 @@ export default function Sidebar({ connected }: Props) {
 					</div>
 
 					<div className="mt-auto flex flex-col gap-3 pt-8 text-sm text-zinc-500">
-						<Image src={tagLogo} alt="f1-dash tag logo" className="h-auto w-28" />
+						<Image src={tagLogo} alt="f1-dash tag logo" className="h-auto w-28" loading="eager" />
 						<p>Version: {process.env.version}</p>
 					</div>
 				</nav>

@@ -8,6 +8,7 @@ authors = ["slowlydev"]
 [dependencies]
 shared = { workspace = true }
 signalr = { workspace = true }
+dotenvy = { workspace = true }
 
 anyhow = "1.0.98"
 axum = { version = "0.8.4", features = ["http2"] }

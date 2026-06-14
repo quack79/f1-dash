@@ -19,7 +19,7 @@ pub struct AppState {
 }
 
 pub async fn run(lines: Vec<String>) -> Result<(), Error> {
-    let addr = env::var("ADDRESS")?;
+    let addr = env::var("ADDRESS").unwrap_or_else(|_| "0.0.0.0:8000".to_string());
 
     let app_state = Arc::new(AppState { lines });
 
