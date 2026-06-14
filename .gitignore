@@ -12,4 +12,3 @@ compose.env
 # data
 *.data.*
 *.txt
-*.sh
