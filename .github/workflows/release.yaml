@@ -1,11 +1,11 @@
 name: release
 
-# runs on tag push and develop branch push
+# runs on tag push and docker branch push
 
 on:
   push:
     branches:
-      - develop
+      - docker
     tags:
       - v*
 
@@ -49,7 +49,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.USER }}/${{ matrix.image }}
           tags: |
-            type=ref,event=branch,branch=develop,value=dev
+            type=ref,event=branch,branch=docker,value=dev
             type=semver,pattern={{version}}
 
       - name: Build and push
