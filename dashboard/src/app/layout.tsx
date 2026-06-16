@@ -1,9 +1,7 @@
 import { type ReactNode } from "react";
-import Script from "next/script";
 
 import "@/styles/globals.css";
 
-import { env } from "@/env";
 import EnvScript from "@/env-script";
 import OledModeProvider from "@/components/OledModeProvider";
 
@@ -22,12 +20,6 @@ export default function RootLayout({ children }: Props) {
 		<html lang="en" className={`${GeistSans.variable} ${GeistMono.variable} font-sans text-white`}>
 			<head>
 				<EnvScript />
-
-				{env.TRACKING_ID && env.TRACKING_URL && (
-					<>
-						<Script strategy="afterInteractive" data-site-id={env.TRACKING_ID} src={env.TRACKING_URL} />
-					</>
-				)}
 			</head>
 
 			<body>

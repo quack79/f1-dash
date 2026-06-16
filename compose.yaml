@@ -1,6 +1,6 @@
 services:
   api:
-    image: ghcr.io/slowlydev/f1-dash-api:latest
+    image: ghcr.io/quack79/f1-dash-api:latest
     ports:
       - 4010:80
     environment:
@@ -9,7 +9,7 @@ services:
       - ORIGIN=http://localhost:3000
 
   realtime:
-    image: ghcr.io/slowlydev/f1-dash-realtime:latest
+    image: ghcr.io/quack79/f1-dash-realtime:latest
     ports:
       - 4000:80
     environment:
@@ -18,7 +18,7 @@ services:
       - ORIGIN=http://localhost:3000
 
   web:
-    image: ghcr.io/slowlydev/f1-dash:latest
+    image: ghcr.io/quack79/f1-dash:latest
     depends_on:
       - realtime
       - api
