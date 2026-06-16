@@ -1,0 +1,49 @@
+services:
+  api:
+    image: ghcr.io/quack79/f1-dash-api:latest
+    networks:
+      - internal
+    environment:
+      - RUST_LOG=api=info
+      - ADDRESS=0.0.0.0:80
+      - ORIGIN=https://${F1_DOMAIN}
+
+  realtime:
+    image: ghcr.io/quack79/f1-dash-realtime:latest
+    networks:
+      - internal
+      - traefik
+    environment:
+      - RUST_LOG=realtime=info
+      - ADDRESS=0.0.0.0:80
+      - ORIGIN=https://${F1_DOMAIN}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.f1-realtime.rule=Host(`realtime.${F1_DOMAIN}`)"
+      - "traefik.http.routers.f1-realtime.entrypoints=websecure"
+      - "traefik.http.routers.f1-realtime.tls.certresolver=letsencrypt"
+      - "traefik.http.services.f1-realtime.loadbalancer.server.port=80"
+
+  web:
+    image: ghcr.io/quack79/f1-dash:latest
+    depends_on:
+      - realtime
+      - api
+    networks:
+      - internal
+      - traefik
+    environment:
+      - NEXT_PUBLIC_LIVE_URL=https://realtime.${F1_DOMAIN}
+      - API_URL=http://api
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.f1-web.rule=Host(`${F1_DOMAIN}`)"
+      - "traefik.http.routers.f1-web.entrypoints=websecure"
+      - "traefik.http.routers.f1-web.tls.certresolver=letsencrypt"
+      - "traefik.http.services.f1-web.loadbalancer.server.port=3000"
+
+networks:
+  internal:
+    driver: bridge
+  traefik:
+    external: true
