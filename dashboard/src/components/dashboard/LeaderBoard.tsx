@@ -44,15 +44,11 @@ export default function LeaderBoard() {
 }
 
 const TableHeaders = () => {
-	const carMetrics = useSettingsStore((state) => state.carMetrics);
-
 	return (
 		<div
 			className="grid items-center gap-2 p-1 px-2 text-sm font-medium text-zinc-500"
 			style={{
-				gridTemplateColumns: carMetrics
-					? "5.5rem 3.5rem 5.5rem 4rem 5rem 5.5rem auto 10.5rem"
-					: "5.5rem 3.5rem 5.5rem 4rem 5rem 5.5rem auto",
+				gridTemplateColumns: "5.5rem 3.5rem 5.5rem 4rem 5rem 5.5rem auto",
 			}}
 		>
 			<p>Position</p>
@@ -62,23 +58,18 @@ const TableHeaders = () => {
 			<p>Gap</p>
 			<p>LapTime</p>
 			<p>Sectors</p>
-			{carMetrics && <p>Car Metrics</p>}
 		</div>
 	);
 };
 
 const SkeletonDriver = () => {
-	const carMetrics = useSettingsStore((state) => state.carMetrics);
-
 	const animateClass = "h-8 animate-pulse rounded-md bg-zinc-800";
 
 	return (
 		<div
 			className="grid items-center gap-2 p-1.5"
 			style={{
-				gridTemplateColumns: carMetrics
-					? "5.5rem 3.5rem 5.5rem 4rem 5rem 5.5rem auto 10.5rem"
-					: "5.5rem 3.5rem 5.5rem 4rem 5rem 5.5rem auto",
+				gridTemplateColumns: "5.5rem 3.5rem 5.5rem 4rem 5rem 5.5rem auto",
 			}}
 		>
 			<div className={animateClass} style={{ width: "100%" }} />
@@ -116,17 +107,6 @@ const SkeletonDriver = () => {
 					</div>
 				))}
 			</div>
-
-			{carMetrics && (
-				<div className="flex w-full gap-2">
-					<div className={clsx(animateClass, "w-8")} />
-
-					<div className="flex flex-1 flex-col gap-1">
-						<div className={clsx(animateClass, "h-1/2!")} />
-						<div className={clsx(animateClass, "h-1/2!")} />
-					</div>
-				</div>
-			)}
 		</div>
 	);
 };
