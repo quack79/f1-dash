@@ -24,7 +24,7 @@ export const PUBLIC_ENV_KEY = "__ENV";
 const fullSchema = server.merge(client);
 type Env = z.input<typeof fullSchema>;
 
-type SPR = z.SafeParseReturnType<Env, Env>;
+type SPR = ReturnType<typeof fullSchema.safeParse>;
 
 declare global {
 	interface Window {
