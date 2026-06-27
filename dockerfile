@@ -1,20 +1,16 @@
-FROM rust:alpine AS base
-
+FROM lukemathwalker/cargo-chef:latest-rust-alpine AS chef
 RUN apk add --no-cache musl-dev pkgconfig openssl-libs-static openssl-dev
 
-FROM base AS builder-base
+FROM chef AS planner
 WORKDIR /usr/src/app
+COPY . .
+RUN cargo chef prepare --recipe-path recipe.json
 
-COPY Cargo.lock .
-COPY Cargo.toml .
-
-COPY realtime realtime
-COPY shared shared
-COPY signalr signalr
-COPY api api
-COPY simulator simulator
-
-FROM builder-base AS builder
+FROM chef AS builder
+WORKDIR /usr/src/app
+COPY --from=planner /usr/src/app/recipe.json recipe.json
+RUN cargo chef cook --release --recipe-path recipe.json
+COPY . .
 RUN cargo b -r
 
 

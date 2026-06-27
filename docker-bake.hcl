@@ -1,51 +1,41 @@
+variable "REGISTRY" {
+  default = "ghcr.io"
+}
+
+variable "OWNER" {
+  default = "quack79"
+}
+
 group "default" {
   targets = ["f1-dash", "f1-dash-api", "f1-dash-realtime"]
 }
 
-group "arm64" {
-  targets = ["f1-dash", "f1-dash-api", "f1-dash-realtime"]
-  platforms = ["linux/arm64"]
-}
-
-group "amd64" {
-  targets = ["f1-dash", "f1-dash-api", "f1-dash-realtime"]
-  platforms = ["linux/amd64"]
-}
-
-group "all" {
-  targets = ["f1-dash", "f1-dash-api", "f1-dash-realtime"]
-  platforms = ["linux/arm64", "linux/amd64"]
-}
-
 target "docker-metadata-action" {}
-
-// actual servives and images below
 
 target "f1-dash" {
   inherits = ["docker-metadata-action"]
 
-  context = "./dashboard"
+  context    = "./dashboard"
   dockerfile = "dockerfile"
 
-  # tags = ["ghcr.io/quack79/f1-dash:latest"]
+  cache-from = ["type=registry,ref=${REGISTRY}/${OWNER}/f1-dash:cache"]
+  cache-to   = ["type=registry,ref=${REGISTRY}/${OWNER}/f1-dash:cache,mode=max"]
 }
 
 target "f1-dash-api" {
-  inherits = ["docker-metadata-action"]
-
-  context = "."
+  context    = "."
   dockerfile = "dockerfile"
-  target = "api"
+  target     = "api"
 
-  # tags = ["ghcr.io/quack79/f1-dash-api:latest"]
+  cache-from = ["type=registry,ref=${REGISTRY}/${OWNER}/f1-dash-api:cache"]
+  cache-to   = ["type=registry,ref=${REGISTRY}/${OWNER}/f1-dash-api:cache,mode=max"]
 }
 
 target "f1-dash-realtime" {
-  inherits = ["docker-metadata-action"]
-
-  context = "."
+  context    = "."
   dockerfile = "dockerfile"
-  target = "realtime"
+  target     = "realtime"
 
-  # tags = ["ghcr.io/quack79/f1-dash-realtime:latest"]
+  cache-from = ["type=registry,ref=${REGISTRY}/${OWNER}/f1-dash-realtime:cache"]
+  cache-to   = ["type=registry,ref=${REGISTRY}/${OWNER}/f1-dash-realtime:cache,mode=max"]
 }

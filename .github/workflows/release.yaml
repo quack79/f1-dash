@@ -11,15 +11,11 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  USER: ${{ github.repository_owner }}
+  OWNER: ${{ github.repository_owner }}
 
 jobs:
-  build-and-push:
+  build-dashboard:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        image: [f1-dash, f1-dash-api, f1-dash-realtime]
 
     permissions:
       contents: read
@@ -37,9 +33,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3.6.0
-
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3.10.0
 
@@ -47,7 +40,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5.7.0
         with:
-          images: ${{ env.REGISTRY }}/${{ env.USER }}/${{ matrix.image }}
+          images: ${{ env.REGISTRY }}/${{ env.OWNER }}/f1-dash
           tags: |
             type=ref,event=branch,branch=docker,value=dev
             type=semver,pattern={{version}}
@@ -56,10 +49,61 @@ jobs:
         id: push
         uses: docker/bake-action@v6.6.0
         with:
-          targets: ${{ matrix.image }}
+          targets: f1-dash
           push: true
           provenance: true
-          set: |
-            *.platform=linux/amd64,linux/arm64
           files: |
             cwd://${{ steps.meta.outputs.bake-file }}
+
+  build-rust:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3.4.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3.10.0
+
+      - name: Extract Docker Metadata (api)
+        id: meta-api
+        uses: docker/metadata-action@v5.7.0
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.OWNER }}/f1-dash-api
+          bake-target: f1-dash-api
+          tags: |
+            type=ref,event=branch,branch=docker,value=dev
+            type=semver,pattern={{version}}
+
+      - name: Extract Docker Metadata (realtime)
+        id: meta-realtime
+        uses: docker/metadata-action@v5.7.0
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.OWNER }}/f1-dash-realtime
+          bake-target: f1-dash-realtime
+          tags: |
+            type=ref,event=branch,branch=docker,value=dev
+            type=semver,pattern={{version}}
+
+      - name: Build and push
+        id: push
+        uses: docker/bake-action@v6.6.0
+        with:
+          targets: f1-dash-api f1-dash-realtime
+          push: true
+          provenance: true
+          files: |
+            cwd://${{ steps.meta-api.outputs.bake-file }}
+            cwd://${{ steps.meta-realtime.outputs.bake-file }}
