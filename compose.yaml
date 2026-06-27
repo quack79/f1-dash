@@ -6,7 +6,7 @@ services:
     environment:
       - RUST_LOG=api=info
       - ADDRESS=0.0.0.0:80
-      - ORIGIN=https://${F1_DOMAIN}
+      - ORIGIN=https://${F1_DOMAIN:-localhost}
 
   realtime:
     image: ghcr.io/quack79/f1-dash-realtime:latest
@@ -17,7 +17,7 @@ services:
     environment:
       - RUST_LOG=realtime=info
       - ADDRESS=0.0.0.0:80
-      - ORIGIN=https://${F1_DOMAIN}
+      - ORIGIN=https://${F1_DOMAIN:-localhost}
 
   web:
     image: ghcr.io/quack79/f1-dash:latest
@@ -29,7 +29,7 @@ services:
     networks:
       - internal
     environment:
-      - NEXT_PUBLIC_LIVE_URL=https://realtime.${F1_DOMAIN}
+      - NEXT_PUBLIC_LIVE_URL=https://realtime.${F1_DOMAIN:-localhost}
       - API_URL=http://api
 
 networks:
