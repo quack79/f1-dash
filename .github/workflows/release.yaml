@@ -12,6 +12,7 @@ on:
 env:
   REGISTRY: ghcr.io
   OWNER: ${{ github.repository_owner }}
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: false
 
 jobs:
   build-dashboard:
@@ -101,7 +102,9 @@ jobs:
         id: push
         uses: docker/bake-action@v6.6.0
         with:
-          targets: f1-dash-api f1-dash-realtime
+          targets: |
+            f1-dash-api
+            f1-dash-realtime
           push: true
           provenance: true
           files: |
