@@ -29,6 +29,10 @@ const liveTimingItems = [
 		name: "Track Map",
 	},
 	{
+		href: "/dashboard/race-control",
+		name: "Race Control",
+	},
+	{
 		href: "/dashboard/standings",
 		name: "Standings",
 	},

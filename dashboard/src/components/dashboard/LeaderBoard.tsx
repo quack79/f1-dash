@@ -48,13 +48,13 @@ const TableHeaders = () => {
 		<div
 			className="grid items-center gap-2 p-1 px-2 text-sm font-medium text-zinc-500"
 			style={{
-				gridTemplateColumns: "5.5rem 3.5rem 5.5rem 4rem 5rem 5.5rem auto",
+				gridTemplateColumns: "5.5rem 3.5rem 5.5rem 2.25rem 5rem 5.5rem auto",
 			}}
 		>
 			<p>Position</p>
 			<p>PIT</p>
 			<p>Tire</p>
-			<p>Info</p>
+			<p>▲/▼</p>
 			<p>Gap</p>
 			<p>LapTime</p>
 			<p>Sectors</p>
@@ -69,7 +69,7 @@ const SkeletonDriver = () => {
 		<div
 			className="grid items-center gap-2 p-1.5"
 			style={{
-				gridTemplateColumns: "5.5rem 3.5rem 5.5rem 4rem 5rem 5.5rem auto",
+				gridTemplateColumns: "5.5rem 3.5rem 5.5rem 2.25rem 5rem 5.5rem auto",
 			}}
 		>
 			<div className={animateClass} style={{ width: "100%" }} />

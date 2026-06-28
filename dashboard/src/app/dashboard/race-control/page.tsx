@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from "motion/react";
 import clsx from "clsx";
 
-import Map from "@/components/dashboard/Map";
+import RaceControl from "@/components/dashboard/RaceControl";
 import DriverTag from "@/components/driver/DriverTag";
 import DriverDRS from "@/components/driver/DriverDRS";
 import DriverInfo from "@/components/driver/DriverInfo";
@@ -16,7 +16,7 @@ import { useDataStore } from "@/stores/useDataStore";
 import type { Driver, TimingDataDriver } from "@/types/state.type";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 
-export default function TrackMap() {
+export default function RaceControlPage() {
 	const drivers = useDataStore((state) => state.state?.DriverList);
 	const driversTiming = useDataStore((state) => state.state?.TimingData);
 	const showTableHeader = useSettingsStore((state) => state.tableHeaders);
@@ -35,8 +35,8 @@ export default function TrackMap() {
 							.sort(sortPos)
 							.filter((timingDriver) => drivers[timingDriver.RacingNumber] !== undefined)
 							.map((timingDriver, index) => (
-								<TrackMapDriver
-									key={`trackmap.driver.${timingDriver.RacingNumber}`}
+								<RaceControlPageDriver
+									key={`racecontrol.driver.${timingDriver.RacingNumber}`}
 									position={index + 1}
 									driver={drivers[timingDriver.RacingNumber]}
 									timingDriver={timingDriver}
@@ -46,14 +46,15 @@ export default function TrackMap() {
 				)}
 			</div>
 
-			<div className="md:flex-1">
-				<Map />
+			<div className="flex min-w-0 flex-1 flex-col overflow-y-auto rounded-lg border border-zinc-800 p-2 md:h-full">
+				<PanelHeading>Race Control</PanelHeading>
+				<RaceControl />
 			</div>
 		</div>
 	);
 }
 
-type TrackMapDriverProps = {
+type RaceControlPageDriverProps = {
 	position: number;
 	driver: Driver;
 	timingDriver: TimingDataDriver;
@@ -71,7 +72,7 @@ const inDangerZone = (position: number, sessionPart: number) => {
 	}
 };
 
-const TrackMapDriver = ({ position, driver, timingDriver }: TrackMapDriverProps) => {
+const RaceControlPageDriver = ({ position, driver, timingDriver }: RaceControlPageDriverProps) => {
 	const sessionPart = useDataStore((state) => state.state?.TimingData?.SessionPart);
 	const timingStatsDriver = useDataStore((state) => state.state?.TimingStats?.Lines[driver.RacingNumber]);
 	const appTimingDriver = useDataStore((state) => state.state?.TimingAppData?.Lines[driver.RacingNumber]);
@@ -124,7 +125,7 @@ const SkeletonDriver = () => {
 		<div
 			className="grid place-items-center items-center gap-1 p-1"
 			style={{
-				gridTemplateColumns: "5.5rem 4rem 5.5rem 5rem 5rem",
+				gridTemplateColumns: "5.5rem 4rem 2.1rem 5rem 5rem",
 			}}
 		>
 			<div className={animateClass} style={{ width: "100%" }} />
@@ -146,3 +147,11 @@ const SkeletonDriver = () => {
 		</div>
 	);
 };
+
+function PanelHeading({ children }: { children: string }) {
+	return (
+		<h2 className="sticky -top-2 z-10 -mx-2 -mt-2 mb-2 border-b border-zinc-800 px-2 py-2 text-sm font-medium text-zinc-300 backdrop-blur">
+			{children}
+		</h2>
+	);
+}

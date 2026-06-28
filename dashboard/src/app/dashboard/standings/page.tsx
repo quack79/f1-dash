@@ -9,6 +9,7 @@ type DriverStanding = {
 		givenName: string;
 		familyName: string;
 		permanentNumber: string;
+		nationality: string;
 	};
 	Constructors: {
 		constructorId: string;
@@ -25,6 +26,31 @@ type ConstructorStanding = {
 	};
 };
 
+const nationalityToCode: Record<string, string> = {
+	Italian: "ita",
+	British: "gbr",
+	Australian: "aus",
+	Monegasque: "mon",
+	Dutch: "ned",
+	French: "fra",
+	Spanish: "esp",
+	Brazilian: "bra",
+	German: "ger",
+	Mexican: "mex",
+	Canadian: "can",
+	American: "usa",
+	"New Zealander": "nzl",
+	Argentine: "arg",
+	Thai: "tha",
+	Finnish: "fin",
+	Japanese: "jpn",
+	Chinese: "chn",
+	Austrian: "aut",
+	Belgian: "bel",
+	Hungarian: "hun",
+	Portuguese: "por",
+};
+
 const logoMapper: Record<string, string> = {
 	red_bull: "red-bull-racing",
 	mercedes: "mercedes",
@@ -35,9 +61,8 @@ const logoMapper: Record<string, string> = {
 	haas: "haas-f1-team",
 	williams: "williams",
 	aston_martin: "aston-martin",
-	kick_sauber: "kick-sauber",
-	sauber: "kick-sauber",
-	alfa: "kick-sauber",
+	audi: "audi",
+	cadillac: "cadillac",
 };
 
 const getLogoFileName = (constructorId: string) => {
@@ -77,7 +102,7 @@ export default function Standings() {
 	return (
 		<div className="grid h-full grid-cols-1 divide-y divide-zinc-800 lg:grid-cols-2 lg:divide-x lg:divide-y-0">
 			<div className="h-full p-4">
-				<h2 className="text-xl">Driver Championship Standings</h2>
+				<h2 className="text-xl">Drivers' Championship</h2>
 
 				{error && <p className="mt-4 text-red-500">{error}</p>}
 
@@ -89,21 +114,51 @@ export default function Standings() {
 
 					{driverStandings &&
 						driverStandings.map((driver) => {
+							const team = driver.Constructors[0];
+							const flagCode = nationalityToCode[driver.Driver.nationality];
 							return (
 								<div
-									className="grid items-center p-2"
+									className="grid items-center gap-2 p-2"
 									style={{
-										gridTemplateColumns: "2rem 1fr 4rem",
+										gridTemplateColumns: "2rem 24px 1fr 4rem 2rem 24px",
 									}}
 									key={driver.Driver.permanentNumber || driver.Driver.familyName}
 								>
 									<p className="font-bold">{driver.position}</p>
+
+									<div className="flex size-6 items-center justify-center overflow-hidden rounded-lg">
+										{team && (
+											// eslint-disable-next-line @next/next/no-img-element
+											<img
+												src={`/team-logos/${getLogoFileName(team.constructorId)}.svg`}
+												alt={team.name}
+												className="max-h-full max-w-full object-contain"
+												onError={(e) => {
+													(e.currentTarget as HTMLImageElement).style.visibility = "hidden";
+												}}
+											/>
+										)}
+									</div>
 
 									<p className="truncate">
 										{driver.Driver.givenName} {driver.Driver.familyName}
 									</p>
 
 									<p className="text-right whitespace-nowrap">{driver.points} pts</p>
+
+									<p className="text-right font-mono text-zinc-400">{driver.Driver.permanentNumber}</p>
+
+									<div className="overflow-hidden rounded">
+										{/* eslint-disable-next-line @next/next/no-img-element */}
+										<img
+											src={`/country-flags/${flagCode}.svg`}
+											alt={driver.Driver.nationality}
+											className="h-4 w-6 object-cover"
+											onError={(e) => {
+												(e.currentTarget as HTMLImageElement).style.visibility = "hidden";
+											}}
+										/>
+									</div>
 								</div>
 							);
 						})}
@@ -161,12 +216,15 @@ const DriverSkeletonItem = () => {
 		<div
 			className="grid items-center gap-2 p-2"
 			style={{
-				gridTemplateColumns: "2rem auto 4rem",
+				gridTemplateColumns: "2rem 24px auto 4rem 2rem 24px",
 			}}
 		>
 			<div className="h-4 w-4 animate-pulse rounded-md bg-zinc-800" />
+			<div className="h-6 w-6 animate-pulse rounded-md bg-zinc-800" />
 			<div className="h-4 w-32 animate-pulse rounded-md bg-zinc-800" />
 			<div className="ml-auto h-4 w-12 animate-pulse rounded-md bg-zinc-800" />
+			<div className="h-4 w-6 animate-pulse rounded-md bg-zinc-800" />
+			<div className="h-4 w-6 animate-pulse rounded-md bg-zinc-800" />
 		</div>
 	);
 };

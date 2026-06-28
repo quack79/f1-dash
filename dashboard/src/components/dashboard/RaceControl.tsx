@@ -17,7 +17,7 @@ export default function RaceControl() {
 	const raceControlChimeVolume = useSettingsStore((state) => state.raceControlChimeVolume);
 
 	const chimeRef = useRef<HTMLAudioElement | null>(null);
-	const pastMessageTimestampsRef = useRef<string[] | null>(null);
+	const seenUtcsRef = useRef<Set<string> | null>(null);
 
 	useEffect(() => {
 		if (typeof window !== "undefined") {
@@ -32,23 +32,31 @@ export default function RaceControl() {
 		// eslint-disable-next-line @eslint-react/exhaustive-deps
 	}, []);
 
+	// Keep audio volume in sync with settings changes.
+	useEffect(() => {
+		if (chimeRef.current) chimeRef.current.volume = raceControlChimeVolume / 100;
+	}, [raceControlChimeVolume]);
+
 	useEffect(() => {
 		if (typeof window === "undefined") return;
-
 		if (messages === undefined || messages === null) return;
 
-		if (!pastMessageTimestampsRef.current) {
-			pastMessageTimestampsRef.current = messages.map((msg) => msg.Utc);
+		if (!seenUtcsRef.current) {
+			seenUtcsRef.current = new Set(messages.map((msg) => msg.Utc));
 			return;
 		}
 
-		const newMessages = messages.filter((msg) => !pastMessageTimestampsRef.current?.includes(msg.Utc));
+		const newMessages = messages.filter((msg) => !seenUtcsRef.current?.has(msg.Utc));
 
-		if (newMessages.length > 0 && raceControlChime) {
+		if (raceControlChime && newMessages.length > 0) {
+			console.debug(
+				"[RC chime] new messages:",
+				newMessages.map((m) => m.Utc),
+			);
 			chimeRef.current?.play();
 		}
 
-		pastMessageTimestampsRef.current = messages.map((msg) => msg.Utc);
+		for (const msg of messages) seenUtcsRef.current.add(msg.Utc);
 		// eslint-disable-next-line @eslint-react/exhaustive-deps
 	}, [messages]);
 

@@ -34,7 +34,7 @@ export default function Page() {
 				</div>
 
 				<div>
-					<PanelHeading>Violations</PanelHeading>
+					<PanelHeading>Track Limits</PanelHeading>
 					<TrackViolations />
 				</div>
 			</div>

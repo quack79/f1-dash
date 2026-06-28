@@ -25,20 +25,22 @@ export const getSchedule = async () => {
 export default async function Schedule() {
 	const schedule = await getSchedule();
 
-	if (!schedule) {
+	if (!schedule || schedule.length === 0) {
 		return (
 			<div className="flex h-44 flex-col items-center justify-center">
-				<p>Schedule not found</p>
+				<p className="text-zinc-500">
+					{!schedule ? "Could not load schedule — check the API service is running." : "No rounds scheduled."}
+				</p>
 			</div>
 		);
 	}
 
-	const next = schedule.filter((round) => !round.over)[0];
+	const upcoming = schedule.filter((round) => !round.over).slice(1);
 
 	return (
 		<div className="mb-20 grid grid-cols-1 gap-8 md:grid-cols-2">
-			{schedule.map((round) => (
-				<Round nextName={next?.name} round={round} key={`round.${round.name}`} />
+			{upcoming.map((round) => (
+				<Round round={round} key={`round.${round.name}`} />
 			))}
 		</div>
 	);

@@ -6,11 +6,6 @@ import Schedule from "@/components/schedule/Schedule";
 export default async function SchedulePage() {
 	return (
 		<div>
-			<div className="my-4">
-				<h1 className="text-3xl">Up Next</h1>
-				<p className="text-zinc-500">All times are local time</p>
-			</div>
-
 			<Suspense fallback={<NextRoundLoading />}>
 				<NextRound />
 			</Suspense>

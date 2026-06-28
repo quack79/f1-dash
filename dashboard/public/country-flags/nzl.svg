@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480">
+  <!-- Blue background -->
+  <path fill="#00247D" d="M0 0h640v480H0z"/>
+  <!-- Union Jack canton (top-left 320x240) -->
+  <!-- St Andrew's cross (white diagonals) -->
+  <path fill="#fff" d="M0 0l320 240M320 0L0 240" stroke="#fff" stroke-width="48"/>
+  <!-- St Patrick's cross (red diagonals, offset) -->
+  <path fill="none" stroke="#CF142B" stroke-width="32" d="M0 0l320 240M320 0L0 240"/>
+  <!-- St George's cross (white) -->
+  <path fill="#fff" d="M136 0h48v240h-48zM0 96h320v48H0z"/>
+  <!-- St George's cross (red) -->
+  <path fill="#CF142B" d="M148 0h24v240h-24zM0 108h320v24H0z"/>
+  <!-- Southern Cross: 4 red stars with white outline on fly side -->
+  <!-- Star helper: 5-point star polygon at (cx,cy) outer r, inner r -->
+  <!-- Star 1: top ~(490, 85) r=28 -->
+  <polygon fill="#fff" points="490,57 497,79 520,79 502,93 509,115 490,101 471,115 478,93 460,79 483,79"/>
+  <polygon fill="#CC142B" points="490,62 496,81 516,81 500,92 506,112 490,99 474,112 480,92 464,81 484,81"/>
+  <!-- Star 2: right ~(565, 190) r=24 -->
+  <polygon fill="#fff" points="565,166 571,185 590,185 575,196 581,215 565,204 549,215 555,196 540,185 559,185"/>
+  <polygon fill="#CC142B" points="565,171 570,188 587,188 573,198 578,215 565,205 552,215 557,198 543,188 560,188"/>
+  <!-- Star 3: bottom ~(495, 315) r=28 -->
+  <polygon fill="#fff" points="495,287 502,309 525,309 507,323 514,345 495,331 476,345 483,323 465,309 488,309"/>
+  <polygon fill="#CC142B" points="495,292 501,311 521,311 505,322 511,342 495,329 479,342 485,322 469,311 489,311"/>
+  <!-- Star 4: left ~(410, 240) r=20 -->
+  <polygon fill="#fff" points="410,220 416,236 433,236 420,246 425,262 410,252 395,262 400,246 387,236 404,236"/>
+  <polygon fill="#CC142B" points="410,224 415,238 430,238 418,247 422,261 410,252 398,261 402,247 390,238 405,238"/>
+</svg>

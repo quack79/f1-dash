@@ -11,7 +11,6 @@ import Flag from "@/components/Flag";
 
 type Props = {
 	round: RoundType;
-	nextName?: string;
 };
 
 const countryCodeMap: Record<string, string> = {
@@ -42,27 +41,16 @@ const countryCodeMap: Record<string, string> = {
 	"United States": "usa",
 };
 
-export default function Round({ round, nextName }: Props) {
+export default function Round({ round }: Props) {
 	const countryCode = countryCodeMap[round.countryName];
 
 	return (
-		<div className={clsx(round.over && "opacity-50")}>
+		<div>
 			<div className="flex items-center justify-between border-b border-zinc-800 pb-2">
 				<div className="flex items-center gap-2">
-					<div className="flex items-center gap-2">
-						<Flag countryCode={countryCode} className="h-8 w-11"></Flag>
-						<p className="text-2xl">{round.countryName}</p>
-					</div>
-					{round.name === nextName && (
-						<>
-							{utc().isBetween(utc(round.start), utc(round.end)) ? (
-								<p className="text-indigo-500">Current</p>
-							) : (
-								<p className="text-indigo-500">Up Next</p>
-							)}
-						</>
-					)}
-					{round.over && <p className="text-red-500">Over</p>}
+					<Flag countryCode={countryCode} className="h-8 w-11"></Flag>
+					<p className="text-2xl">{round.countryName}</p>
+					{utc().isBetween(utc(round.start), utc(round.end)) && <p className="text-indigo-400">Current</p>}
 				</div>
 
 				<div className="flex gap-1">

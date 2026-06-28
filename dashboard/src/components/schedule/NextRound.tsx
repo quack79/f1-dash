@@ -50,7 +50,10 @@ export default async function NextRound() {
 				</div>
 			)}
 
-			<Round round={next} />
+			<div>
+				<p className="mb-2 text-lg text-indigo-400">Up next</p>
+				<Round round={next} />
+			</div>
 		</div>
 	);
 }

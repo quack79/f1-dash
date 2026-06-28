@@ -28,27 +28,22 @@ export default function SettingsPage() {
 
 			<div className="flex gap-2">
 				<Toggle enabled={settings.tableHeaders} setEnabled={(v) => settings.setTableHeaders(v)} />
-				<p className="text-zinc-500">Show Driver Table Header</p>
+				<p className="text-zinc-500">Show Column Headers</p>
 			</div>
 
 			<div className="flex gap-2">
 				<Toggle enabled={settings.showBestSectors} setEnabled={(v) => settings.setShowBestSectors(v)} />
-				<p className="text-zinc-500">Show Drivers Best Sectors</p>
+				<p className="text-zinc-500">Show Best Sectors</p>
 			</div>
 
 			<div className="flex gap-2">
 				<Toggle enabled={settings.showMiniSectors} setEnabled={(v) => settings.setShowMiniSectors(v)} />
-				<p className="text-zinc-500">Show Drivers Mini Sectors</p>
+				<p className="text-zinc-500">Show Mini Sectors</p>
 			</div>
 
 			<div className="flex gap-2">
 				<Toggle enabled={settings.oledMode} setEnabled={(v) => settings.setOledMode(v)} />
 				<p className="text-zinc-500">OLED Mode (Pure Black Background)</p>
-			</div>
-
-			<div className="flex gap-2">
-				<Toggle enabled={settings.useSafetyCarColors} setEnabled={(v) => settings.setUseSafetyCarColors(v)} />
-				<p className="text-zinc-500">Use Safety Car Colors</p>
 			</div>
 
 			<h2 className="my-4 text-2xl">Race Control</h2>

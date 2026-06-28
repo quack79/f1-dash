@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480">
+  <path fill="#74ACDF" d="M0 0h640v160H0z"/>
+  <path fill="#fff" d="M0 160h640v160H0z"/>
+  <path fill="#74ACDF" d="M0 320h640v160H0z"/>
+  <g transform="translate(320 240)" fill="#F6B40E">
+    <path d="M0-65 6-30-6-30z"/>
+    <path d="M0-65 6-30-6-30z" transform="rotate(22.5)"/>
+    <path d="M0-65 6-30-6-30z" transform="rotate(45)"/>
+    <path d="M0-65 6-30-6-30z" transform="rotate(67.5)"/>
+    <path d="M0-65 6-30-6-30z" transform="rotate(90)"/>
+    <path d="M0-65 6-30-6-30z" transform="rotate(112.5)"/>
+    <path d="M0-65 6-30-6-30z" transform="rotate(135)"/>
+    <path d="M0-65 6-30-6-30z" transform="rotate(157.5)"/>
+    <path d="M0-65 6-30-6-30z" transform="rotate(180)"/>
+    <path d="M0-65 6-30-6-30z" transform="rotate(202.5)"/>
+    <path d="M0-65 6-30-6-30z" transform="rotate(225)"/>
+    <path d="M0-65 6-30-6-30z" transform="rotate(247.5)"/>
+    <path d="M0-65 6-30-6-30z" transform="rotate(270)"/>
+    <path d="M0-65 6-30-6-30z" transform="rotate(292.5)"/>
+    <path d="M0-65 6-30-6-30z" transform="rotate(315)"/>
+    <path d="M0-65 6-30-6-30z" transform="rotate(337.5)"/>
+    <circle r="32"/>
+  </g>
+</svg>

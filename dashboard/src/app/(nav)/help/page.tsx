@@ -123,6 +123,14 @@ export default function HelpPage() {
 
 					<p>In the pit lane or leaving</p>
 				</div>
+
+				<div className="flex items-center gap-2">
+					<div className="w-16">
+						<DriverDRS inPit={false} pitOut={false} retired={true} />
+					</div>
+
+					<p>Retired from the race</p>
+				</div>
 			</div>
 
 			<h2 className="my-4 text-2xl">Tires</h2>
