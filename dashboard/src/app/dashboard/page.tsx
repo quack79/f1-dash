@@ -16,7 +16,7 @@ export default function Page() {
 				</div>
 
 				<div className="flex min-w-0 flex-col gap-2 2xl:sticky 2xl:top-0 2xl:h-0 2xl:min-h-full">
-					<div>
+					<div className="2xl:h-[60vh]">
 						<Map viewBoxBottomPadding={250} />
 					</div>
 
