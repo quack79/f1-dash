@@ -68,7 +68,7 @@ export default function RaceControl() {
 
 			{messages && gmtOffset && (
 				<AnimatePresence>
-					{messages
+					{[...messages]
 						.sort(sortUtc)
 						.filter((msg) => (msg.Flag ? msg.Flag.toLowerCase() !== "blue" : true))
 						.map((msg) => (
