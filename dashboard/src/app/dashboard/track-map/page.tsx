@@ -91,7 +91,7 @@ const TrackMapDriver = ({ position, driver, timingDriver }: TrackMapDriverProps)
 			<div
 				className="grid items-center gap-2"
 				style={{
-					gridTemplateColumns: "6.5rem 3.5rem 2.25rem 5rem 5rem",
+					gridTemplateColumns: "5.5rem 3.5rem 2.25rem 5rem 5rem",
 				}}
 			>
 				<DriverTag className="min-w-full!" short={driver.Tla} teamColor={driver.TeamColour} position={position} />
@@ -107,7 +107,7 @@ const TrackMapDriver = ({ position, driver, timingDriver }: TrackMapDriverProps)
 const TableHeaders = () => (
 	<div
 		className="grid items-center gap-2 px-2 pb-1 text-sm font-medium text-zinc-500"
-		style={{ gridTemplateColumns: "6.5rem 3.5rem 2.25rem 5rem 5rem" }}
+		style={{ gridTemplateColumns: "5.5rem 3.5rem 2.25rem 5rem 5rem" }}
 	>
 		<p>Position</p>
 		<p>PIT</p>
@@ -124,7 +124,7 @@ const SkeletonDriver = () => {
 		<div
 			className="grid place-items-center items-center gap-1 p-1"
 			style={{
-				gridTemplateColumns: "6.5rem 4rem 5.5rem 5rem 5rem",
+				gridTemplateColumns: "5.5rem 4rem 5.5rem 5rem 5rem",
 			}}
 		>
 			<div className={animateClass} style={{ width: "100%" }} />

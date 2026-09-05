@@ -53,7 +53,7 @@ export default function Driver({ driver, timingDriver, position }: Props) {
 		>
 			<div
 				className="grid items-center gap-2"
-				style={{ gridTemplateColumns: "6.5rem 3.5rem 5.5rem 2.25rem 5rem 5.5rem auto" }}
+				style={{ gridTemplateColumns: "5.5rem 3.5rem 5.5rem 2.25rem 5rem 5.5rem auto" }}
 			>
 				<DriverTag className="min-w-full!" short={driver.Tla} teamColor={driver.TeamColour} position={position} />
 				<DriverDRS inPit={timingDriver.InPit} pitOut={timingDriver.PitOut} retired={timingDriver.Retired} />
