@@ -57,7 +57,7 @@ export default function Driver({ driver, timingDriver, position }: Props) {
 				style={{ gridTemplateColumns: "1.75rem 5.5rem 3.5rem 5.5rem 2.25rem 5rem 5.5rem auto" }}
 			>
 				<TeamLogo teamName={driver.TeamName} />
-				<DriverTag className="min-w-[70px]" short={driver.Tla} teamColor={driver.TeamColour} position={position} />
+				<DriverTag className="min-w-full!" short={driver.Tla} teamColor={driver.TeamColour} position={position} />
 				<DriverDRS inPit={timingDriver.InPit} pitOut={timingDriver.PitOut} retired={timingDriver.Retired} />
 				<DriverTire stints={appTimingDriver?.Stints} />
 				<DriverInfo timingDriver={timingDriver} gridPos={appTimingDriver ? parseInt(appTimingDriver.GridPos) : 0} />
