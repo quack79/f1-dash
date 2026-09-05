@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import maplibregl, { Map, Marker } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
-import { fetchCoords } from "@/lib/geocode";
+import { coordsForCircuit } from "@/lib/circuitCoords";
 import { getRainviewer } from "@/lib/rainviewer";
 
 import { useDataStore } from "@/stores/useDataStore";
@@ -66,18 +66,15 @@ export function WeatherMap() {
 
 			if (!meeting) return;
 
-			const [coordsC, coordsA] = await Promise.all([
-				fetchCoords(`${meeting.Country.Name}, ${meeting.Location} circuit`),
-				fetchCoords(`${meeting.Country.Name}, ${meeting.Location} autodrome`),
-			]);
+			const coords = coordsForCircuit(meeting.Location);
 
-			const coords = coordsC || coordsA;
-
+			// Fall back to a zoomed-out world view for a circuit not yet in the coordinates table,
+			// rather than a tight zoom on [0, 0] (off the coast of West Africa).
 			const libMap = new maplibregl.Map({
 				container: mapContainerRef.current,
 				style: "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
-				center: coords ? [coords.lon, coords.lat] : undefined,
-				zoom: 6,
+				center: coords ? [coords.lon, coords.lat] : [10, 20],
+				zoom: coords ? 6 : 1,
 				canvasContextAttributes: {
 					antialias: true,
 				},
