@@ -5,6 +5,7 @@ import clsx from "clsx";
 
 import RaceControl from "@/components/dashboard/RaceControl";
 import DriverTag from "@/components/driver/DriverTag";
+import TeamLogo from "@/components/driver/TeamLogo";
 import DriverDRS from "@/components/driver/DriverDRS";
 import DriverInfo from "@/components/driver/DriverInfo";
 import DriverGap from "@/components/driver/DriverGap";
@@ -92,9 +93,10 @@ const RaceControlPageDriver = ({ position, driver, timingDriver }: RaceControlPa
 			<div
 				className="grid items-center gap-2"
 				style={{
-					gridTemplateColumns: "6.5rem 3.5rem 2.25rem 5rem 5rem",
+					gridTemplateColumns: "1.75rem 5.5rem 3.5rem 2.25rem 5rem 5rem",
 				}}
 			>
+				<TeamLogo teamName={driver.TeamName} />
 				<DriverTag className="min-w-full!" short={driver.Tla} teamColor={driver.TeamColour} position={position} />
 				<DriverDRS inPit={timingDriver.InPit} pitOut={timingDriver.PitOut} retired={timingDriver.Retired} />
 				<DriverInfo timingDriver={timingDriver} gridPos={appTimingDriver ? parseInt(appTimingDriver.GridPos) : 0} />
@@ -108,8 +110,9 @@ const RaceControlPageDriver = ({ position, driver, timingDriver }: RaceControlPa
 const TableHeaders = () => (
 	<div
 		className="grid items-center gap-2 px-2 pb-1 text-sm font-medium text-zinc-500"
-		style={{ gridTemplateColumns: "6.5rem 3.5rem 2.25rem 5rem 5rem" }}
+		style={{ gridTemplateColumns: "1.75rem 5.5rem 3.5rem 2.25rem 5rem 5rem" }}
 	>
+		<p />
 		<p>Position</p>
 		<p>PIT</p>
 		<p>▲/▼</p>
@@ -125,9 +128,11 @@ const SkeletonDriver = () => {
 		<div
 			className="grid place-items-center items-center gap-1 p-1"
 			style={{
-				gridTemplateColumns: "6.5rem 4rem 2.1rem 5rem 5rem",
+				gridTemplateColumns: "1.75rem 5.5rem 4rem 2.1rem 5rem 5rem",
 			}}
 		>
+			<div className={clsx(animateClass, "size-6")} />
+
 			<div className={animateClass} style={{ width: "100%" }} />
 
 			<div className={animateClass} style={{ width: "90%" }} />

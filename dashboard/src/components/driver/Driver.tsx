@@ -9,6 +9,7 @@ import { useSettingsStore } from "@/stores/useSettingsStore";
 import { useDataStore } from "@/stores/useDataStore";
 
 import DriverTag from "./DriverTag";
+import TeamLogo from "./TeamLogo";
 import DriverDRS from "./DriverDRS";
 import DriverGap from "./DriverGap";
 import DriverTire from "./DriverTire";
@@ -53,8 +54,9 @@ export default function Driver({ driver, timingDriver, position }: Props) {
 		>
 			<div
 				className="grid items-center gap-2"
-				style={{ gridTemplateColumns: "6.5rem 3.5rem 5.5rem 2.25rem 5rem 5.5rem auto" }}
+				style={{ gridTemplateColumns: "1.75rem 5.5rem 3.5rem 5.5rem 2.25rem 5rem 5.5rem auto" }}
 			>
+				<TeamLogo teamName={driver.TeamName} />
 				<DriverTag className="min-w-full!" short={driver.Tla} teamColor={driver.TeamColour} position={position} />
 				<DriverDRS inPit={timingDriver.InPit} pitOut={timingDriver.PitOut} retired={timingDriver.Retired} />
 				<DriverTire stints={appTimingDriver?.Stints} />
