@@ -1,11 +1,11 @@
 name: release
 
-# runs on tag push and docker branch push
+# runs on tag push and dev branch push
 
 on:
   push:
     branches:
-      - docker
+      - dev
     tags:
       - v*
 
@@ -43,7 +43,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.OWNER }}/f1-dash
           tags: |
-            type=ref,event=branch,branch=docker,value=dev
+            type=ref,event=branch,branch=dev,value=latest
             type=semver,pattern={{version}}
 
       - name: Build and push
@@ -85,7 +85,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.OWNER }}/f1-dash-api
           bake-target: f1-dash-api
           tags: |
-            type=ref,event=branch,branch=docker,value=dev
+            type=ref,event=branch,branch=dev,value=latest
             type=semver,pattern={{version}}
 
       - name: Extract Docker Metadata (realtime)
@@ -95,7 +95,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.OWNER }}/f1-dash-realtime
           bake-target: f1-dash-realtime
           tags: |
-            type=ref,event=branch,branch=docker,value=dev
+            type=ref,event=branch,branch=dev,value=latest
             type=semver,pattern={{version}}
 
       - name: Build and push
