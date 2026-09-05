@@ -20,7 +20,7 @@ export default function LeaderBoard() {
 
 			{(!drivers || !driversTiming) &&
 				// eslint-disable-next-line @eslint-react/no-array-index-key
-				new Array(20).fill("").map((_, index) => <SkeletonDriver key={`driver.loading.${index}`} />)}
+				new Array(22).fill("").map((_, index) => <SkeletonDriver key={`driver.loading.${index}`} />)}
 
 			<LayoutGroup key="drivers">
 				{drivers && driversTiming && (

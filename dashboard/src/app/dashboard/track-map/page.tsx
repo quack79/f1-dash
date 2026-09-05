@@ -27,7 +27,7 @@ export default function TrackMap() {
 				{showTableHeader && <TableHeaders />}
 				{(!drivers || !driversTiming) &&
 					// eslint-disable-next-line @eslint-react/no-array-index-key
-					new Array(20).fill("").map((_, index) => <SkeletonDriver key={`driver.loading.${index}`} />)}
+					new Array(22).fill("").map((_, index) => <SkeletonDriver key={`driver.loading.${index}`} />)}
 
 				{drivers && driversTiming && (
 					<AnimatePresence>
@@ -62,7 +62,7 @@ type TrackMapDriverProps = {
 const inDangerZone = (position: number, sessionPart: number) => {
 	switch (sessionPart) {
 		case 1:
-			return position > 15;
+			return position > 16;
 		case 2:
 			return position > 10;
 		case 3:
