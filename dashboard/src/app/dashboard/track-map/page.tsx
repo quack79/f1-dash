@@ -96,7 +96,7 @@ const TrackMapDriver = ({ position, driver, timingDriver }: TrackMapDriverProps)
 				}}
 			>
 				<TeamLogo teamName={driver.TeamName} />
-				<DriverTag className="min-w-full!" short={driver.Tla} teamColor={driver.TeamColour} position={position} />
+				<DriverTag className="min-w-[70px]" short={driver.Tla} teamColor={driver.TeamColour} position={position} />
 				<DriverDRS inPit={timingDriver.InPit} pitOut={timingDriver.PitOut} retired={timingDriver.Retired} />
 				<DriverInfo timingDriver={timingDriver} gridPos={appTimingDriver ? parseInt(appTimingDriver.GridPos) : 0} />
 				<DriverGap timingDriver={timingDriver} sessionPart={sessionPart} />
