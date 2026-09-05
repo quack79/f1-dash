@@ -23,7 +23,7 @@ export default function Qualifying() {
 					.filter((d) => d.Sectors.map((s) => s.PersonalFastest).includes(true)); // has any personal fastest
 
 	const sessionPart = driversTiming?.SessionPart;
-	const comparingDriverPosition = sessionPart === 1 ? 15 : sessionPart === 2 ? 10 : sessionPart === 3 ? 1 : 1;
+	const comparingDriverPosition = sessionPart === 1 ? 16 : sessionPart === 2 ? 10 : sessionPart === 3 ? 1 : 1;
 	const comparingDriver = driversTiming
 		? Object.values(driversTiming.Lines).find((d) => parseInt(d.Position) === comparingDriverPosition)
 		: undefined;

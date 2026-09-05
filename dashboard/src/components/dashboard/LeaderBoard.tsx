@@ -20,7 +20,7 @@ export default function LeaderBoard() {
 
 			{(!drivers || !driversTiming) &&
 				// eslint-disable-next-line @eslint-react/no-array-index-key
-				new Array(20).fill("").map((_, index) => <SkeletonDriver key={`driver.loading.${index}`} />)}
+				new Array(22).fill("").map((_, index) => <SkeletonDriver key={`driver.loading.${index}`} />)}
 
 			<LayoutGroup key="drivers">
 				{drivers && driversTiming && (
@@ -48,7 +48,7 @@ const TableHeaders = () => {
 		<div
 			className="grid items-center gap-2 p-1 px-2 text-sm font-medium text-zinc-500"
 			style={{
-				gridTemplateColumns: "5.5rem 3.5rem 5.5rem 2.25rem 5rem 5.5rem auto",
+				gridTemplateColumns: "6.5rem 3.5rem 5.5rem 2.25rem 5rem 5.5rem auto",
 			}}
 		>
 			<p>Position</p>
@@ -69,7 +69,7 @@ const SkeletonDriver = () => {
 		<div
 			className="grid items-center gap-2 p-1.5"
 			style={{
-				gridTemplateColumns: "5.5rem 3.5rem 5.5rem 2.25rem 5rem 5.5rem auto",
+				gridTemplateColumns: "6.5rem 3.5rem 5.5rem 2.25rem 5rem 5.5rem auto",
 			}}
 		>
 			<div className={animateClass} style={{ width: "100%" }} />

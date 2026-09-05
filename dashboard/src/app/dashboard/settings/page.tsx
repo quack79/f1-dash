@@ -42,6 +42,11 @@ export default function SettingsPage() {
 			</div>
 
 			<div className="flex gap-2">
+				<Toggle enabled={settings.showMiniSectorTicks} setEnabled={(v) => settings.setShowMiniSectorTicks(v)} />
+				<p className="text-zinc-500">Show Mini-Sector Ticks on Track Map</p>
+			</div>
+
+			<div className="flex gap-2">
 				<Toggle enabled={settings.oledMode} setEnabled={(v) => settings.setOledMode(v)} />
 				<p className="text-zinc-500">OLED Mode (Pure Black Background)</p>
 			</div>

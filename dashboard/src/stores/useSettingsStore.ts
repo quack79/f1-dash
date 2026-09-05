@@ -17,6 +17,9 @@ type SettingsStore = {
 	showMiniSectors: boolean;
 	setShowMiniSectors: (showMiniSectors: boolean) => void;
 
+	showMiniSectorTicks: boolean;
+	setShowMiniSectorTicks: (showMiniSectorTicks: boolean) => void;
+
 	oledMode: boolean;
 	setOledMode: (oledMode: boolean) => void;
 
@@ -52,6 +55,9 @@ export const useSettingsStore = create<SettingsStore>()(
 
 				showMiniSectors: true,
 				setShowMiniSectors: (showMiniSectors: boolean) => set({ showMiniSectors }),
+
+				showMiniSectorTicks: false,
+				setShowMiniSectorTicks: (showMiniSectorTicks: boolean) => set({ showMiniSectorTicks }),
 
 				oledMode: false,
 				setOledMode: (oledMode: boolean) => set({ oledMode }),

@@ -110,7 +110,7 @@ export default function Standings() {
 					{!driverStandings &&
 						!error &&
 						// eslint-disable-next-line @eslint-react/no-array-index-key
-						new Array(20).fill("").map((_, index) => <DriverSkeletonItem key={`driver.loading.${index}`} />)}
+						new Array(22).fill("").map((_, index) => <DriverSkeletonItem key={`driver.loading.${index}`} />)}
 
 					{driverStandings &&
 						driverStandings.map((driver) => {
@@ -174,7 +174,7 @@ export default function Standings() {
 					{!teamStandings &&
 						!error &&
 						// eslint-disable-next-line @eslint-react/no-array-index-key
-						new Array(10).fill("").map((_, index) => <TeamSkeletonItem key={`team.loading.${index}`} />)}
+						new Array(11).fill("").map((_, index) => <TeamSkeletonItem key={`team.loading.${index}`} />)}
 
 					{teamStandings &&
 						teamStandings.map((team) => (
