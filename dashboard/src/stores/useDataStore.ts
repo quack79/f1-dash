@@ -10,6 +10,7 @@ type DataStore = {
 	positions: Positions | null;
 
 	setState: (state: Partial<State> | null) => void;
+	resetState: (state: State | null) => void;
 	setCarsData: (carsData: CarsData | null) => void;
 	setPositions: (positions: Positions | null) => void;
 };
@@ -29,6 +30,12 @@ export const useDataStore = create<DataStore>((set) => ({
 					}
 				: null,
 		})),
+	resetState: (newState: State | null) =>
+		set({
+			state: newState,
+			carsData: null,
+			positions: null,
+		}),
 	setCarsData: (carsData: CarsData | null) => set({ carsData }),
 	setPositions: (positions: Positions | null) => set({ positions }),
 }));

@@ -12,7 +12,7 @@ use axum::{
 use futures::{Stream, StreamExt, stream};
 use tracing::{debug, error, info};
 
-use crate::http_server::Context;
+use crate::http_server::{BroadcastMessage, Context};
 
 pub async fn sse_stream(
     State(ctx): State<Arc<Context>>,
@@ -33,7 +33,7 @@ pub async fn sse_stream(
 
     info!(?connections, "connection stats");
 
-    let initial = stream::once(async {
+    let initial = stream::once(async move {
         debug!("streaming current initial");
         Ok(Event::default().event("initial").data(initial_state))
     });
@@ -48,7 +48,11 @@ pub async fn sse_stream(
                 }
             }
         })
-        .map(|data| Event::default().event("update").data(data))
+        .map(|msg| match msg {
+            BroadcastMessage::Initial(data) => Event::default().event("initial").data(data),
+            BroadcastMessage::Update(data) => Event::default().event("update").data(data),
+            BroadcastMessage::Reset => Event::default().event("reset").data("{}"),
+        })
         .map(Ok);
 
     let stream = initial.chain(updates);

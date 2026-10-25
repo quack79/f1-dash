@@ -15,11 +15,12 @@ const UPDATE_MS = 200;
 
 type Props = {
 	updateState: (state: State) => void;
+	resetState: (state: State | null) => void;
 	updatePosition: (pos: Positions) => void;
 	updateCarData: (car: CarsData) => void;
 };
 
-export const useDataEngine = ({ updateState, updatePosition, updateCarData }: Props) => {
+export const useDataEngine = ({ updateState, resetState, updatePosition, updateCarData }: Props) => {
 	const buffers = {
 		ExtrapolatedClock: useStatefulBuffer(),
 		TopThree: useStatefulBuffer(),
@@ -59,8 +60,20 @@ export const useDataEngine = ({ updateState, updatePosition, updateCarData }: Pr
 		return unsubscribe;
 	}, []);
 
+	const handleReset = () => {
+		Object.values(buffers).forEach((buffer) => buffer.reset());
+		carBuffer.reset();
+		posBuffer.reset();
+		resetState(null);
+		setMaxDelay(0);
+	};
+
 	const handleInitial = ({ CarDataZ: carZ, PositionZ: posZ, ...initial }: MessageInitial) => {
-		updateState(initial);
+		// Cleanly reset buffers and previous state before applying fresh initial snapshot
+		Object.values(buffers).forEach((buffer) => buffer.reset());
+		carBuffer.reset();
+		posBuffer.reset();
+		resetState(initial);
 
 		Object.keys(buffers).forEach((key) => {
 			const data = initial[key as keyof typeof initial];
@@ -176,6 +189,7 @@ export const useDataEngine = ({ updateState, updatePosition, updateCarData }: Pr
 	return {
 		handleUpdate,
 		handleInitial,
+		handleReset,
 		maxDelay,
 	};
 };

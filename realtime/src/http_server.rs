@@ -18,12 +18,19 @@ mod drivers;
 mod health;
 mod realtime;
 
-pub struct Context {
-    pub state_service: StateService,
-    pub tx: Sender<String>,
+#[derive(Clone, Debug)]
+pub enum BroadcastMessage {
+    Initial(String),
+    Update(String),
+    Reset,
 }
 
-pub async fn start(state_service: StateService, tx: Sender<String>) -> Result<(), Error> {
+pub struct Context {
+    pub state_service: StateService,
+    pub tx: Sender<BroadcastMessage>,
+}
+
+pub async fn start(state_service: StateService, tx: Sender<BroadcastMessage>) -> Result<(), Error> {
     let addr = env::var("ADDRESS").unwrap_or_else(|_| "0.0.0.0:4000".to_string());
 
     let context = Arc::new(Context { state_service, tx });

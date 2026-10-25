@@ -27,15 +27,20 @@ type Props = {
 
 export default function DashboardClientLayout({ children }: Props) {
 	const stores = useStores();
-	const { handleInitial, handleUpdate, maxDelay } = useDataEngine(stores);
-	const { connected } = useSocket({ handleInitial, handleUpdate });
+	const { handleInitial, handleUpdate, handleReset, maxDelay } = useDataEngine(stores);
+	const { connected } = useSocket({ handleInitial, handleUpdate, handleReset });
 
 	const delay = useSettingsStore((state) => state.delay);
 	const syncing = delay > maxDelay;
 
 	useWakeLock();
 
-	const ended = useDataStore(({ state }) => state?.SessionStatus?.Status === "Ends");
+	const ended = useDataStore(
+		({ state }) =>
+			state?.SessionStatus?.Status === "Ends" ||
+			state?.SessionStatus?.Status === "Finalised" ||
+			state?.SessionStatus?.Status === "Finished",
+	);
 
 	return (
 		<div className="flex h-screen w-full md:pt-2 md:pr-2 md:pb-2">

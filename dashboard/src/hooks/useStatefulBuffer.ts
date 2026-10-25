@@ -13,11 +13,17 @@ export const useStatefulBuffer = <T>() => {
 		if (currentRef.current) buffer.push(currentRef.current);
 	};
 
+	const reset = () => {
+		currentRef.current = null;
+		buffer.reset();
+	};
+
 	return {
 		push,
 		latest: buffer.latest,
 		delayed: buffer.delayed,
 		cleanup: buffer.cleanup,
 		maxDelay: buffer.maxDelay,
+		reset,
 	};
 };

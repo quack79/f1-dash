@@ -1,22 +1,23 @@
-use std::{env, str::FromStr};
+use std::{env, str::FromStr, time::Duration};
 
-use futures::{SinkExt, Stream};
+use futures::{SinkExt, Stream, StreamExt};
 use reqwest::{
     Url,
     header::{self, HeaderValue},
 };
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use serde_json::Value;
-use tokio_stream::StreamExt;
 use tokio_tungstenite::tungstenite::{Message, client::IntoClientRequest, http::Request};
-use tracing::{debug, error, info};
+use tracing::{debug, error, info, trace, warn};
 use uuid::Uuid;
 
 /// ASCII Record Separator — used to delimit SignalR Core JSON messages.
-const RECORD_SEPARATOR: &str = "\u{001E}";
+pub const RECORD_SEPARATOR: &str = "\u{001E}";
 /// Message type constants (SignalR Core Hub Protocol)
-const INVOCATION: i32 = 1;
-const COMPLETION: i32 = 3;
+pub const INVOCATION: i32 = 1;
+pub const COMPLETION: i32 = 3;
+pub const PING: i32 = 6;
+pub const CLOSE: i32 = 7;
 
 // ──────────────────────────── Negotiation ────────────────────────────
 #[derive(Deserialize, Debug)]
@@ -39,8 +40,10 @@ struct Negotiation {
 async fn negotiate(base_url: &str) -> Result<Negotiation, anyhow::Error> {
     let negotiate_url = format!("https://{}/negotiate", base_url);
 
-    // Step 1: OPTIONS pre-flight to get AWSALBCORS cookie
-    let client = reqwest::Client::new();
+    // Step 1: OPTIONS pre-flight to get AWSALBCORS cookie with a 15-second timeout
+    let client = reqwest::Client::builder()
+        .timeout(Duration::from_secs(15))
+        .build()?;
 
     let options_res = client
         .request(reqwest::Method::OPTIONS, &negotiate_url)
@@ -104,7 +107,12 @@ pub async fn create_client(base_url: &str, _hub: &str) -> Result<SignalrClient, 
     if let Some(dev_url) = env::var("F1_DEV_URL").ok() {
         let url = Url::from_str(&dev_url)?;
         info!("dev mode: connecting directly to {url}");
-        let (stream, _) = tokio_tungstenite::connect_async(url.into_client_request()?).await?;
+        let (stream, _) = tokio::time::timeout(
+            Duration::from_secs(10),
+            tokio_tungstenite::connect_async(url.into_client_request()?),
+        )
+        .await
+        .map_err(|_| anyhow::anyhow!("Timeout connecting to simulator at {dev_url}"))??;
         return Ok(SignalrClient { stream });
     }
 
@@ -118,7 +126,7 @@ pub async fn create_client(base_url: &str, _hub: &str) -> Result<SignalrClient, 
 
     info!("connecting to {ws_url}");
 
-    let mut req: Request<()> = ws_url.into_client_request()?;
+    let mut req: Request<()> = ws_url.clone().into_client_request()?;
 
     let headers = req.headers_mut();
     headers.insert(header::USER_AGENT, HeaderValue::from_static("BestHTTP"));
@@ -130,17 +138,22 @@ pub async fn create_client(base_url: &str, _hub: &str) -> Result<SignalrClient, 
         headers.insert(header::COOKIE, negotiation.cookie.parse()?);
     }
 
-    let (mut stream, res) = tokio_tungstenite::connect_async(req).await?;
+    let (mut stream, res) = tokio::time::timeout(
+        Duration::from_secs(15),
+        tokio_tungstenite::connect_async(req),
+    )
+    .await
+    .map_err(|_| anyhow::anyhow!("Timeout connecting WebSocket to {ws_url}"))??;
     debug!(?res, "ws connected");
 
     // ── SignalR Core Handshake ──
     let json = serialize(&serde_json::json!({"protocol": "json", "version": 1}))?;
     stream.send(Message::text(json)).await?;
 
-    // Receive handshake response (should be {}\u{001E} for success)
-    let handshake_response = stream
-        .next()
+    // Receive handshake response (should be {}\u{001E} for success) with a 15s timeout
+    let handshake_response = tokio::time::timeout(Duration::from_secs(15), stream.next())
         .await
+        .map_err(|_| anyhow::anyhow!("Timeout waiting for SignalR handshake response"))?
         .ok_or_else(|| anyhow::anyhow!("No handshake response"))??;
 
     match &handshake_response {
@@ -197,6 +210,14 @@ struct FeedMessage {
     arguments: (String, Value, String),
 }
 
+#[derive(Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+struct MinimalMessage {
+    r#type: i32,
+    #[serde(default)]
+    error: Option<String>,
+}
+
 // ──────────────────────────── Subscribe ────────────────────────────
 pub async fn subscribe(
     client: &mut SignalrClient,
@@ -228,36 +249,40 @@ pub async fn subscribe(
 
     debug!("subscribe invocation sent, waiting for completion...");
 
-    // Wait for the Completion response (type 3) with our invocation ID
-    loop {
-        let response = client
-            .stream
-            .next()
-            .await
-            .ok_or_else(|| anyhow::anyhow!("No response received from server"))??;
+    // Wait for the Completion response (type 3) with our invocation ID, timeout after 30s
+    tokio::time::timeout(Duration::from_secs(30), async {
+        loop {
+            let response = client
+                .stream
+                .next()
+                .await
+                .ok_or_else(|| anyhow::anyhow!("No response received from server"))??;
 
-        let Message::Text(txt) = response else {
-            continue;
-        };
-
-        for msg in split_messages(&txt) {
-            let Ok(completion) = deserialize::<Completion>(msg) else {
+            let Message::Text(txt) = response else {
                 continue;
             };
 
-            if completion.r#type != COMPLETION || completion.invocation_id != invocation_id {
-                continue;
-            }
+            for msg in split_messages(&txt) {
+                let Ok(completion) = deserialize::<Completion>(msg) else {
+                    continue;
+                };
 
-            if let Some(error) = completion.error {
-                return Err(anyhow::anyhow!("Server error: {}", error));
-            }
+                if completion.r#type != COMPLETION || completion.invocation_id != invocation_id {
+                    continue;
+                }
 
-            return completion
-                .result
-                .ok_or_else(|| anyhow::anyhow!("No result received"));
+                if let Some(error) = completion.error {
+                    return Err(anyhow::anyhow!("Server error: {}", error));
+                }
+
+                return completion
+                    .result
+                    .ok_or_else(|| anyhow::anyhow!("No result received"));
+            }
         }
-    }
+    })
+    .await
+    .map_err(|_| anyhow::anyhow!("Timeout waiting for SignalR subscribe completion"))?
 }
 
 fn serialize<T>(value: &T) -> Result<String, serde_json::Error>
@@ -273,18 +298,19 @@ fn deserialize<T: DeserializeOwned>(input: &str) -> Result<T, serde_json::Error>
     serde_json::from_str(stripped)
 }
 
-fn split_messages(input: &str) -> Vec<&str> {
+pub fn split_messages(input: &str) -> Vec<&str> {
     input
         .split(RECORD_SEPARATOR)
         .filter(|item| !item.trim().is_empty())
         .collect()
 }
 
-fn strip_record_separator(input: &str) -> &str {
+pub fn strip_record_separator(input: &str) -> &str {
     input.trim_end_matches(RECORD_SEPARATOR)
 }
 
 // ──────────────────────────── Public Data Types ────────────────────────────
+#[derive(Debug, Clone)]
 pub struct UpdateArgs {
     pub topic: String,
     pub data: serde_json::Value,
@@ -296,64 +322,189 @@ pub struct UpdateArgs {
 /// Listen to WebSocket messages and parse them into structured UpdateArgs.
 /// In SignalR Core, feed updates arrive as Invocation messages (type 1)
 /// with target "feed" and arguments [topic, data, timestamp].
+///
+/// Features active client pings (`{"type":6}\u{001E}`) every 15 seconds,
+/// server ping & close frame handling, and a 40-second watchdog timer to cleanly
+/// detect half-open TCP connections.
 pub fn listen(client: SignalrClient) -> impl Stream<Item = Vec<UpdateArgs>> {
-    client.stream.filter_map(|message| match message {
-        Ok(Message::Text(txt)) => {
-            let messages = split_messages(&txt);
+    let (tx, rx) = tokio::sync::mpsc::channel::<Vec<UpdateArgs>>(64);
 
-            if messages.is_empty() {
-                return None;
-            }
+    tokio::spawn(async move {
+        let (mut ws_tx, mut ws_rx) = client.stream.split();
+        let mut ping_interval = tokio::time::interval(Duration::from_secs(15));
+        ping_interval.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Delay);
+        // Consume immediate first tick so we wait 15s before first ping
+        ping_interval.tick().await;
 
-            let mut results = Vec::new();
+        let watchdog_timeout = Duration::from_secs(40);
 
-            for msg in messages {
-                let invocation = match deserialize::<FeedMessage>(msg) {
-                    Ok(invocation) => invocation,
-                    Err(err) => {
-                        debug!(?err, frame = msg, "skipping non-feed signalr frame");
-                        continue;
-                    }
-                };
-
-                if invocation.r#type != INVOCATION || invocation.target != "feed" {
-                    continue;
+        loop {
+            tokio::select! {
+                // If receiver dropped, cleanly abort task
+                _ = tx.closed() => {
+                    debug!("listen receiver dropped, terminating SignalR reader task");
+                    break;
                 }
 
-                let (topic, data, timestamp) = invocation.arguments;
+                // Send active SignalR Core ping frame to keep the connection alive
+                _ = ping_interval.tick() => {
+                    let ping_msg = Message::text(format!("{{\"type\":{}}}{}", PING, RECORD_SEPARATOR));
+                    if let Err(err) = ws_tx.send(ping_msg).await {
+                        warn!(?err, "failed to send SignalR keepalive ping; connection dropped");
+                        break;
+                    }
+                    trace!("sent SignalR client keepalive ping");
+                }
 
-                results.push(UpdateArgs {
-                    topic,
-                    data,
-                    timestamp,
-                });
+                // Read incoming WebSocket frames with watchdog timeout
+                msg_opt = tokio::time::timeout(watchdog_timeout, ws_rx.next()) => {
+                    let msg = match msg_opt {
+                        Ok(Some(Ok(m))) => m,
+                        Ok(Some(Err(err))) => {
+                            error!(?err, "WebSocket error during listen");
+                            break;
+                        }
+                        Ok(None) => {
+                            info!("WebSocket connection closed by server");
+                            break;
+                        }
+                        Err(_) => {
+                            warn!("SignalR watchdog timeout: no messages or heartbeats received for {watchdog_timeout:?}, aborting dead connection");
+                            break;
+                        }
+                    };
+
+                    match msg {
+                        Message::Text(txt) => {
+                            let messages = split_messages(&txt);
+                            let mut results = Vec::new();
+
+                            for raw_msg in messages {
+                                if let Ok(min_msg) = deserialize::<MinimalMessage>(raw_msg) {
+                                    match min_msg.r#type {
+                                        PING => {
+                                            trace!("received SignalR ping frame from server");
+                                            continue;
+                                        }
+                                        CLOSE => {
+                                            warn!(error = ?min_msg.error, "received SignalR Close frame from server, terminating stream");
+                                            return;
+                                        }
+                                        _ => {}
+                                    }
+                                }
+
+                                let invocation = match deserialize::<FeedMessage>(raw_msg) {
+                                    Ok(invocation) => invocation,
+                                    Err(err) => {
+                                        debug!(?err, frame = raw_msg, "skipping non-feed signalr frame");
+                                        continue;
+                                    }
+                                };
+
+                                if invocation.r#type != INVOCATION || invocation.target != "feed" {
+                                    continue;
+                                }
+
+                                let (topic, data, timestamp) = invocation.arguments;
+
+                                results.push(UpdateArgs {
+                                    topic,
+                                    data,
+                                    timestamp,
+                                });
+                            }
+
+                            if !results.is_empty() {
+                                if tx.send(results).await.is_err() {
+                                    debug!("stream receiver dropped while sending updates");
+                                    break;
+                                }
+                            }
+                        }
+                        Message::Ping(payload) => {
+                            trace!("received WebSocket protocol Ping frame");
+                            if let Err(err) = ws_tx.send(Message::Pong(payload)).await {
+                                warn!(?err, "failed to respond with WebSocket Pong");
+                                break;
+                            }
+                        }
+                        Message::Close(frame) => {
+                            info!(?frame, "received WebSocket protocol Close frame");
+                            break;
+                        }
+                        _ => {}
+                    }
+                }
             }
-
-            if results.is_empty() {
-                return None;
-            }
-
-            Some(results)
         }
-        Ok(_) => None,
-        Err(err) => {
-            error!(?err, "ws error");
-            None
-        }
-    })
+    });
+
+    tokio_stream::wrappers::ReceiverStream::new(rx)
 }
 
 // ──────────────────────────── Listen Raw ────────────────────────────
 
 /// Listen to raw WebSocket messages without parsing them.
 /// Returns the raw text messages as-is, useful for saving to a file for replay.
-pub fn listen_raw(client: SignalrClient) -> impl Stream<Item = String> {
-    client.stream.filter_map(|message| match message {
-        Ok(Message::Text(txt)) => Some(txt.to_string()),
-        Ok(_) => None,
-        Err(err) => {
-            error!(?err, "ws error");
-            None
-        }
-    })
+pub fn listen_raw(client: SignalrClient) -> futures::stream::BoxStream<'static, String> {
+    client
+        .stream
+        .filter_map(|message| async move {
+            match message {
+                Ok(Message::Text(txt)) => Some(txt.to_string()),
+                Ok(_) => None,
+                Err(err) => {
+                    error!(?err, "ws error");
+                    None
+                }
+            }
+        })
+        .boxed()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn test_split_messages() {
+        let payload = format!("{{\"type\":6}}{}{{\"type\":1,\"target\":\"feed\",\"arguments\":[\"SessionInfo\",{{\"Name\":\"Practice 1\"}},\"2026-10-25T12:00:00Z\"]}}{}", RECORD_SEPARATOR, RECORD_SEPARATOR);
+        let msgs = split_messages(&payload);
+        assert_eq!(msgs.len(), 2);
+        assert_eq!(msgs[0], "{\"type\":6}");
+        assert!(msgs[1].contains("\"target\":\"feed\""));
+    }
+
+    #[test]
+    fn test_parse_minimal_message_ping() {
+        let raw = "{\"type\":6}";
+        let min_msg: MinimalMessage = deserialize(raw).expect("should parse ping");
+        assert_eq!(min_msg.r#type, PING);
+    }
+
+    #[test]
+    fn test_parse_minimal_message_close() {
+        let raw = "{\"type\":7,\"error\":\"Hub closed\",\"allowReconnect\":true}";
+        let min_msg: MinimalMessage = deserialize(raw).expect("should parse close");
+        assert_eq!(min_msg.r#type, CLOSE);
+        assert_eq!(min_msg.error.as_deref(), Some("Hub closed"));
+    }
+
+    #[test]
+    fn test_parse_feed_message() {
+        let raw = json!({
+            "type": 1,
+            "target": "feed",
+            "arguments": ["TrackStatus", { "Status": "1", "Message": "AllClear" }, "2026-10-25T12:00:00Z"]
+        }).to_string();
+
+        let feed: FeedMessage = deserialize(&raw).expect("should parse feed");
+        assert_eq!(feed.r#type, INVOCATION);
+        assert_eq!(feed.target, "feed");
+        assert_eq!(feed.arguments.0, "TrackStatus");
+        assert_eq!(feed.arguments.1["Status"], "1");
+        assert_eq!(feed.arguments.2, "2026-10-25T12:00:00Z");
+    }
 }
