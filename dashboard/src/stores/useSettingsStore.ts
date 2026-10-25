@@ -35,6 +35,9 @@ type SettingsStore = {
 
 	delayIsPaused: boolean;
 	setDelayIsPaused: (delayIsPaused: boolean) => void;
+
+	raceControlHeight: number;
+	setRaceControlHeight: (raceControlHeight: number) => void;
 };
 
 export const useSettingsStore = create<SettingsStore>()(
@@ -75,6 +78,10 @@ export const useSettingsStore = create<SettingsStore>()(
 
 				delayIsPaused: true,
 				setDelayIsPaused: (delayIsPaused: boolean) => set({ delayIsPaused }),
+
+				raceControlHeight: 320,
+				setRaceControlHeight: (raceControlHeight: number) =>
+					set({ raceControlHeight: isNaN(raceControlHeight) ? 320 : raceControlHeight }),
 			}),
 			{
 				name: "settings-storage",

@@ -370,9 +370,15 @@ type Props = {
 	filter?: string[];
 	viewBoxPadding?: number;
 	viewBoxBottomPadding?: number;
+	className?: string;
 };
 
-export default function Map({ filter, viewBoxPadding = SPACE, viewBoxBottomPadding = viewBoxPadding }: Props) {
+export default function Map({
+	filter,
+	viewBoxPadding = SPACE,
+	viewBoxBottomPadding = viewBoxPadding,
+	className,
+}: Props) {
 	const showCornerNumbers = useSettingsStore((state) => state.showCornerNumbers);
 	const showMiniSectorTicks = useSettingsStore((state) => state.showMiniSectorTicks);
 	const favoriteDrivers = useSettingsStore((state) => state.favoriteDrivers);
@@ -542,7 +548,7 @@ export default function Map({ filter, viewBoxPadding = SPACE, viewBoxBottomPaddi
 
 	if (!points || !minX || !minY || !widthX || !widthY) {
 		return (
-			<div className="h-full w-full p-2" style={{ minHeight: "35rem" }}>
+			<div className={clsx("h-full min-h-0 w-full p-2", className)}>
 				<div className="h-full w-full animate-pulse rounded-lg bg-zinc-800" />
 			</div>
 		);
@@ -551,7 +557,8 @@ export default function Map({ filter, viewBoxPadding = SPACE, viewBoxBottomPaddi
 	return (
 		<svg
 			viewBox={`${minX} ${minY} ${widthX} ${widthY}`}
-			className="h-full w-full xl:max-h-screen"
+			className={clsx("h-full w-full xl:max-h-screen", className)}
+			preserveAspectRatio="xMidYMid meet"
 			xmlns="http://www.w3.org/2000/svg"
 		>
 			<path
