@@ -12,12 +12,12 @@ use tracing::{debug, error, info, trace, warn};
 use uuid::Uuid;
 
 /// ASCII Record Separator — used to delimit SignalR Core JSON messages.
-pub const RECORD_SEPARATOR: &str = "\u{001E}";
+const RECORD_SEPARATOR: &str = "\u{001E}";
 /// Message type constants (SignalR Core Hub Protocol)
-pub const INVOCATION: i32 = 1;
-pub const COMPLETION: i32 = 3;
-pub const PING: i32 = 6;
-pub const CLOSE: i32 = 7;
+const INVOCATION: i32 = 1;
+const COMPLETION: i32 = 3;
+const PING: i32 = 6;
+const CLOSE: i32 = 7;
 
 // ──────────────────────────── Negotiation ────────────────────────────
 #[derive(Deserialize, Debug)]
@@ -298,14 +298,14 @@ fn deserialize<T: DeserializeOwned>(input: &str) -> Result<T, serde_json::Error>
     serde_json::from_str(stripped)
 }
 
-pub fn split_messages(input: &str) -> Vec<&str> {
+fn split_messages(input: &str) -> Vec<&str> {
     input
         .split(RECORD_SEPARATOR)
         .filter(|item| !item.trim().is_empty())
         .collect()
 }
 
-pub fn strip_record_separator(input: &str) -> &str {
+fn strip_record_separator(input: &str) -> &str {
     input.trim_end_matches(RECORD_SEPARATOR)
 }
 
@@ -336,7 +336,11 @@ pub fn listen(client: SignalrClient) -> impl Stream<Item = Vec<UpdateArgs>> {
         // Consume immediate first tick so we wait 15s before first ping
         ping_interval.tick().await;
 
+        // Created once and only pushed forward when a frame is received, so our own
+        // keepalive pings never restart it
         let watchdog_timeout = Duration::from_secs(40);
+        let watchdog = tokio::time::sleep(watchdog_timeout);
+        tokio::pin!(watchdog);
 
         loop {
             tokio::select! {
@@ -356,23 +360,27 @@ pub fn listen(client: SignalrClient) -> impl Stream<Item = Vec<UpdateArgs>> {
                     trace!("sent SignalR client keepalive ping");
                 }
 
-                // Read incoming WebSocket frames with watchdog timeout
-                msg_opt = tokio::time::timeout(watchdog_timeout, ws_rx.next()) => {
+                // No frame received within the watchdog window, treat the connection as dead
+                _ = &mut watchdog => {
+                    warn!("SignalR watchdog timeout: no messages or heartbeats received for {watchdog_timeout:?}, aborting dead connection");
+                    break;
+                }
+
+                // Read incoming WebSocket frames
+                msg_opt = ws_rx.next() => {
                     let msg = match msg_opt {
-                        Ok(Some(Ok(m))) => m,
-                        Ok(Some(Err(err))) => {
+                        Some(Ok(m)) => m,
+                        Some(Err(err)) => {
                             error!(?err, "WebSocket error during listen");
                             break;
                         }
-                        Ok(None) => {
+                        None => {
                             info!("WebSocket connection closed by server");
                             break;
                         }
-                        Err(_) => {
-                            warn!("SignalR watchdog timeout: no messages or heartbeats received for {watchdog_timeout:?}, aborting dead connection");
-                            break;
-                        }
                     };
+
+                    watchdog.as_mut().reset(tokio::time::Instant::now() + watchdog_timeout);
 
                     match msg {
                         Message::Text(txt) => {
@@ -470,7 +478,10 @@ mod tests {
 
     #[test]
     fn test_split_messages() {
-        let payload = format!("{{\"type\":6}}{}{{\"type\":1,\"target\":\"feed\",\"arguments\":[\"SessionInfo\",{{\"Name\":\"Practice 1\"}},\"2026-10-25T12:00:00Z\"]}}{}", RECORD_SEPARATOR, RECORD_SEPARATOR);
+        let payload = format!(
+            "{{\"type\":6}}{}{{\"type\":1,\"target\":\"feed\",\"arguments\":[\"SessionInfo\",{{\"Name\":\"Practice 1\"}},\"2026-10-25T12:00:00Z\"]}}{}",
+            RECORD_SEPARATOR, RECORD_SEPARATOR
+        );
         let msgs = split_messages(&payload);
         assert_eq!(msgs.len(), 2);
         assert_eq!(msgs[0], "{\"type\":6}");

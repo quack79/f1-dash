@@ -15,7 +15,7 @@ const UPDATE_MS = 200;
 
 type Props = {
 	updateState: (state: State) => void;
-	resetState: (state: State | null) => void;
+	resetState: () => void;
 	updatePosition: (pos: Positions) => void;
 	updateCarData: (car: CarsData) => void;
 };
@@ -60,20 +60,17 @@ export const useDataEngine = ({ updateState, resetState, updatePosition, updateC
 		return unsubscribe;
 	}, []);
 
+	// only sent by the backend when the session changes, an initial alone must keep the delay buffers
 	const handleReset = () => {
 		Object.values(buffers).forEach((buffer) => buffer.reset());
 		carBuffer.reset();
 		posBuffer.reset();
-		resetState(null);
+		resetState();
 		setMaxDelay(0);
 	};
 
 	const handleInitial = ({ CarDataZ: carZ, PositionZ: posZ, ...initial }: MessageInitial) => {
-		// Cleanly reset buffers and previous state before applying fresh initial snapshot
-		Object.values(buffers).forEach((buffer) => buffer.reset());
-		carBuffer.reset();
-		posBuffer.reset();
-		resetState(initial);
+		updateState(initial);
 
 		Object.keys(buffers).forEach((key) => {
 			const data = initial[key as keyof typeof initial];

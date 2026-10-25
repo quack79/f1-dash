@@ -31,12 +31,6 @@ impl StateService {
         Ok(())
     }
 
-    pub async fn clear_state(&self) -> Result<(), Error> {
-        let mut state = self.state.write().await;
-        *state = Value::Object(serde_json::Map::new());
-        Ok(())
-    }
-
     pub async fn update_state(&self, update: Value) -> Result<(), Error> {
         let mut state = self.state.write().await;
         merge(&mut state, update);
@@ -51,7 +45,10 @@ impl StateService {
 
 pub fn extract_session_id(value: &Value) -> Option<String> {
     let info = value.get("SessionInfo")?;
-    let meeting_key = info.pointer("/Meeting/Key").and_then(|v| v.as_i64()).unwrap_or(0);
+    let meeting_key = info
+        .pointer("/Meeting/Key")
+        .and_then(|v| v.as_i64())
+        .unwrap_or(0);
     let key = info.get("Key").and_then(|v| v.as_i64()).unwrap_or(0);
     let name = info.get("Name").and_then(|v| v.as_str()).unwrap_or("");
     if key == 0 && name.is_empty() {
@@ -89,8 +86,10 @@ mod tests {
     use serde_json::json;
 
     #[tokio::test]
-    async fn test_state_service_clear_and_set() {
+    async fn test_state_service_set_replaces_state() {
         let service = StateService::new();
+        assert_eq!(service.get_session_id().await, None);
+
         let initial = json!({
             "SessionInfo": {
                 "Meeting": { "Key": 1234 },
@@ -106,10 +105,20 @@ mod tests {
             Some("1234:9100:Practice 1".to_string())
         );
 
-        service.clear_state().await.unwrap();
-        let cleared = service.get_state().await.unwrap();
-        assert_eq!(cleared, json!({}));
-        assert_eq!(service.get_session_id().await, None);
+        let next = json!({
+            "SessionInfo": {
+                "Meeting": { "Key": 1234 },
+                "Key": 9101,
+                "Name": "Qualifying"
+            }
+        });
+
+        service.set_state(next.clone()).await.unwrap();
+        assert_eq!(service.get_state().await.unwrap(), next);
+        assert_eq!(
+            service.get_session_id().await,
+            Some("1234:9101:Qualifying".to_string())
+        );
     }
 
     #[test]

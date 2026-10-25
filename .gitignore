@@ -12,3 +12,6 @@ compose.env
 # data
 *.data.*
 *.txt
+
+# claude code
+.claude/

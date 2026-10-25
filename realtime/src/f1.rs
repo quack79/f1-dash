@@ -1,5 +1,5 @@
 use anyhow::Error;
-use serde_json::json;
+use serde_json::{Value, json};
 use tokio::sync::broadcast::Sender;
 use tokio_stream::StreamExt;
 use tracing::{error, info, trace, warn};
@@ -38,34 +38,25 @@ pub async fn ingest_f1(
 
     let initial = signalr::subscribe(&mut client, &TOPICS).await?;
 
-    let new_session_id = extract_session_id(&initial);
+    let session_id = extract_session_id(&initial);
     let prev_session_id = state_service.get_session_id().await;
-
-    let is_new_session = match (&prev_session_id, &new_session_id) {
-        (Some(prev), Some(new)) => prev != new,
-        _ => false,
-    };
-
-    if is_new_session {
-        info!(
-            ?prev_session_id,
-            ?new_session_id,
-            "Detected session transition upon connect/subscribe. Clearing previous session state."
-        );
-        state_service.clear_state().await?;
-        let _ = update_sender.send(BroadcastMessage::Reset);
-    }
+    let session_changed = session_id != prev_session_id;
 
     state_service.set_state(initial.clone()).await?;
 
-    // Notify connected SSE clients of the initial session state
-    let _ = update_sender.send(BroadcastMessage::Initial(initial.to_string()));
+    // Only reset connected clients when the session changed, a routine reconnect
+    // within the same session must not wipe their delay buffers
+    if session_changed {
+        info!(
+            ?prev_session_id,
+            ?session_id,
+            "session changed, resetting connected clients"
+        );
+        let _ = update_sender.send(BroadcastMessage::Reset);
+        let _ = update_sender.send(BroadcastMessage::Initial(initial.to_string()));
+    }
 
-    let current_session_key = initial.pointer("/SessionInfo/Key").and_then(|v| v.as_i64());
-    let current_session_name = initial
-        .pointer("/SessionInfo/Name")
-        .and_then(|v| v.as_str())
-        .map(|s| s.to_string());
+    let current_session_info = initial.get("SessionInfo");
 
     let mut stream = signalr::listen(client);
 
@@ -73,35 +64,15 @@ pub async fn ingest_f1(
         for update in items {
             trace!(?update.topic, "received update");
 
-            if update.topic == "SessionInfo" {
-                let update_key = update.data.get("Key").and_then(|v| v.as_i64());
-                let update_name = update.data.get("Name").and_then(|v| v.as_str());
-
-                let session_changed = match (
-                    current_session_key,
-                    update_key,
-                    current_session_name.as_deref(),
-                    update_name,
-                ) {
-                    (Some(curr_k), Some(new_k), _, _) if curr_k != new_k => true,
-                    (_, _, Some(curr_n), Some(new_n))
-                        if !new_n.is_empty() && curr_n != new_n =>
-                    {
-                        true
-                    }
-                    _ => false,
-                };
-
-                if session_changed {
-                    warn!(
-                        ?current_session_key,
-                        ?update_key,
-                        ?current_session_name,
-                        ?update_name,
-                        "received SessionInfo with new session key/name, restarting ingestion..."
-                    );
-                    return Ok(());
-                }
+            if update.topic == "SessionInfo"
+                && is_session_change(current_session_info, &update.data)
+            {
+                warn!(
+                    ?session_id,
+                    update = ?update.data,
+                    "received SessionInfo for a new session, restarting ingestion..."
+                );
+                return Ok(());
             }
 
             if update.topic == "SessionStatus" {
@@ -126,4 +97,67 @@ pub async fn ingest_f1(
 
     info!("SignalR ingestion stream completed");
     Ok(())
+}
+
+/// Whether a SessionInfo update belongs to a different session than `current`,
+/// the SessionInfo of the snapshot we subscribed with (if it had one)
+fn is_session_change(current: Option<&Value>, update: &Value) -> bool {
+    let key = |info: &Value| info.get("Key").and_then(Value::as_i64);
+    let name = |info: &Value| {
+        info.get("Name")
+            .and_then(Value::as_str)
+            .filter(|name| !name.is_empty())
+            .map(str::to_string)
+    };
+
+    let (current_key, current_name) = (current.and_then(key), current.and_then(name));
+    let (update_key, update_name) = (key(update), name(update));
+
+    match (current_key, &current_name) {
+        // the snapshot had no session, so any update identifying one starts a new session
+        (None, None) => update_key.is_some() || update_name.is_some(),
+        _ => {
+            matches!((current_key, update_key), (Some(c), Some(u)) if c != u)
+                || matches!((current_name, update_name), (Some(c), Some(u)) if c != u)
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_is_session_change() {
+        let current = json!({ "Key": 9100, "Name": "Practice 1" });
+
+        // same session, partial updates
+        assert!(!is_session_change(Some(&current), &json!({ "Key": 9100 })));
+        assert!(!is_session_change(
+            Some(&current),
+            &json!({ "ArchiveStatus": { "Status": "Complete" } })
+        ));
+        assert!(!is_session_change(Some(&current), &json!({ "Name": "" })));
+
+        // new session by key or name
+        assert!(is_session_change(Some(&current), &json!({ "Key": 9101 })));
+        assert!(is_session_change(
+            Some(&current),
+            &json!({ "Name": "Qualifying" })
+        ));
+
+        // snapshot without SessionInfo
+        assert!(is_session_change(
+            None,
+            &json!({ "Key": 9101, "Name": "Qualifying" })
+        ));
+        assert!(is_session_change(
+            Some(&json!({})),
+            &json!({ "Name": "Qualifying" })
+        ));
+        assert!(!is_session_change(
+            None,
+            &json!({ "ArchiveStatus": { "Status": "Complete" } })
+        ));
+    }
 }

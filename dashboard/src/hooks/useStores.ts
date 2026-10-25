@@ -4,7 +4,7 @@ import { useDataStore } from "@/stores/useDataStore";
 
 type Fns = {
 	updateState: (state: State) => void;
-	resetState: (state: State | null) => void;
+	resetState: () => void;
 	updatePosition: (pos: Positions) => void;
 	updateCarData: (car: CarsData) => void;
 };
@@ -14,7 +14,7 @@ export const useStores = (): Fns => {
 
 	return {
 		updateState: (v) => dataStore.setState(v),
-		resetState: (v) => dataStore.resetState(v),
+		resetState: () => dataStore.resetState(),
 		updatePosition: (v) => dataStore.setPositions(v),
 		updateCarData: (v) => dataStore.setCarsData(v),
 	};
